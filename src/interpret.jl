@@ -35,6 +35,7 @@ function interpret(command::CommandRedirect)
         error("this should never happen!")
     end
 end
-interpret(command::CommandPipe) = pipeline(interpret(command.a), interpret(command.b))
-interpret(command::AndCommands) = Base.AndCmds(interpret(command.a), interpret(command.b))
-interpret(command::OrCommands) = Base.OrCmds(interpret(command.a), interpret(command.b))
+interpret(commands::CommandPipe) = pipeline(interpret(commands.a), interpret(commands.b))
+interpret(commands::AndCommands) =
+    Base.AndCmds(interpret(commands.a), interpret(commands.b))
+interpret(commands::OrCommands) = Base.OrCmds(interpret(commands.a), interpret(commands.b))
