@@ -28,11 +28,6 @@ function _show(io::IO, command::Command, indent=0)
             println(io, ' '^((indent + 1) * 2), argument)
         end
     end
-    if command.redirect !== nothing
-        println(io, ' '^(indent * 2), "Redirect:")
-        println(io, ' '^((indent + 1) * 2), "Operator: ", command.redirect.operator)
-        println(io, ' '^((indent + 1) * 2), "Target: ", command.redirect.target)
-    end
 end
 function _show(io::IO, commands::CommandPipe, indent=0)
     println(io, ' '^(indent * 2), "CommandPipe:")
