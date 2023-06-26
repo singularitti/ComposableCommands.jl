@@ -34,7 +34,7 @@ struct Option <: CommandParameter
                 ),
             )
         end
-        return new(long_name, short_name, description, string(value))
+        return new(long_name, short_name, description, value)
     end
 end
 
