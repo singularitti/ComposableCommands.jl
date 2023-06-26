@@ -19,12 +19,7 @@ function interpret(command::Command)
     for arg in command.arguments
         push!(exec, arg)
     end
-    if command.redirect !== nothing
-        push!(exec, command.redirect.operator, command.redirect.target)
-    end
-
-    # Recursively process subcommands
-    for subcommand in command.subcommands
+    for subcommand in command.subcommands  # Recursively process subcommands
         sub_exec = interpret(subcommand)
         append!(exec, sub_exec.exec)
     end
