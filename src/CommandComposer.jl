@@ -74,9 +74,8 @@ struct Command <: AbstractCommand
     name::String
     flags::Vector{Flag}
     options::Vector{Option}
-    subcommands::Vector{AbstractCommand}
     arguments::Vector{String}
-    redirect::Union{Redirect,Nothing}
+    subcommands::Vector{AbstractCommand}
 end
 
 include("show.jl")
