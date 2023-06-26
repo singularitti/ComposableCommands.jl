@@ -13,7 +13,15 @@ function _show(io::IO, command::Command, indent=0)
     if !isempty(command.options)
         println(io, ' '^(indent * 2), "Options:")
         for option in command.options
-            println(io, ' '^((indent + 1) * 2), option.long_name, "/", option.short_name)
+            println(
+                io,
+                ' '^((indent + 1) * 2),
+                option.long_name,
+                "/",
+                option.short_name,
+                " = ",
+                option.value,
+            )
         end
     end
     if !isempty(command.subcommands)
