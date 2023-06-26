@@ -57,6 +57,12 @@ end
 struct Redirect
     operator::String
     target::String
+    function Redirect(operator, target)
+        if operator ∉ ("<", "<<", ">", ">>", "2>", "&>", ">&", "2>&1")
+            throw(ArgumentError("operator `$(operator)` is not supported!"))
+        end
+        return new(operator, target)
+    end
 end
 
 struct CommandRedirect <: AbstractCommand
