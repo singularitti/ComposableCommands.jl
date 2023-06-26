@@ -4,9 +4,9 @@ function interpret(command::Command)
     exec = [command.name]
     for option in command.options
         if isempty(option.long_name)
-            push!(exec, "-$(option.short_name)")
+            push!(exec, "-$(option.short_name)", string(option.value))
         else
-            push!(exec, "--$(option.long_name)")
+            push!(exec, "--$(option.long_name)=$(option.value)")
         end
     end
     for flag in command.flags
