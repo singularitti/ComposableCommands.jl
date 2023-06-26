@@ -25,7 +25,8 @@ struct Option <: CommandParameter
     long_name::String
     short_name::String
     description::String
-    function Option(long_name, short_name, description)
+    value::Any
+    function Option(long_name, short_name, description, value)
         if isempty(long_name) && isempty(short_name)
             throw(
                 ArgumentError(
@@ -33,7 +34,7 @@ struct Option <: CommandParameter
                 ),
             )
         end
-        return new(long_name, short_name, description)
+        return new(long_name, short_name, description, string(value))
     end
 end
 
