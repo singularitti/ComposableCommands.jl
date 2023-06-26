@@ -9,12 +9,32 @@ struct Flag <: CommandParameter
     long_name::String
     short_name::String
     description::String
+    function Flag(long_name, short_name, description)
+        if isempty(long_name) && isempty(short_name)
+            throw(
+                ArgumentError(
+                    "at least one of `long_name` or `short_name` must be non-empty!"
+                ),
+            )
+        end
+        return new(long_name, short_name, description)
+    end
 end
 
 struct Option <: CommandParameter
     long_name::String
     short_name::String
     description::String
+    function Option(long_name, short_name, description)
+        if isempty(long_name) && isempty(short_name)
+            throw(
+                ArgumentError(
+                    "at least one of `long_name` or `short_name` must be non-empty!"
+                ),
+            )
+        end
+        return new(long_name, short_name, description)
+    end
 end
 
 abstract type AbstractCommand end
