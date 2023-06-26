@@ -74,5 +74,6 @@ struct Command <: AbstractCommand
 end
 
 include("show.jl")
+include("interpret.jl")
 
 end
