@@ -1,5 +1,18 @@
 export interpret
 
+"""
+    interpret(command::Command)
+
+Translate a `Command` object into a `Cmd` that can be executed.
+
+# Examples
+```jldoctest
+julia> c = Command("ls", [Flag("all", "a", "list all files")], [], [], []);
+
+julia> interpret(c)
+`ls --all`
+```
+"""
 function interpret(command::Command)
     exec = [command.name]
     for option in command.options
@@ -25,6 +38,26 @@ function interpret(command::Command)
     end
     return Cmd(exec)
 end
+"""
+    interpret(command::CommandRedirect)
+
+Translate a `CommandRedirect` object into a `Base.CmdRedirect` that can be executed, considering the redirection.
+
+# Examples
+```jldoctest
+julia> c = Command("ls", [], [], [], []);
+
+julia> r = Redirect(">", "output.txt");
+
+julia> cr = CommandRedirect(c, r);
+
+julia> cmd = interpret(cr)
+pipeline(`ls`, stdout>Base.FileRedirect("output.txt", false))
+
+julia> typeof(cmd)
+Base.CmdRedirect
+```
+"""
 function interpret(command::CommandRedirect)
     cmd = interpret(command.command)
     if command.redirect.operator in ("<", "<<")
@@ -35,7 +68,67 @@ function interpret(command::CommandRedirect)
         error("this should never happen!")
     end
 end
+"""
+    interpret(commands::CommandPipe)
+
+Translate a `CommandPipe` object into a `Cmd` that can be executed, considering the piping.
+
+# Examples
+```jldoctest
+julia> c1 = Command("ls", [], [], [], []);
+
+julia> c2 = Command("grep", [], [Option("ignore-case", "i", "ignore case", "txt")], [], []);
+
+julia> cp = CommandPipe(c1, c2);
+
+julia> cmd = interpret(cp)
+pipeline(`ls`, stdout=`grep --ignore-case=txt`)
+
+julia> typeof(cmd)
+Base.OrCmds
+```
+"""
 interpret(commands::CommandPipe) = pipeline(interpret(commands.a), interpret(commands.b))
+"""
+    interpret(commands::AndCommands)
+
+Translate an `AndCommands` object into a `Base.AndCmds` that can be executed, considering the conjunction.
+
+# Examples
+```jldoctest
+julia> c1 = Command("ls", [], [], [], []);
+
+julia> c2 = Command("pwd", [], [], [], []);
+
+julia> ac = AndCommands(c1, c2);
+
+julia> cmd = interpret(ac)
+`ls` & `pwd`
+
+julia> typeof(cmd)
+Base.AndCmds
+```
+"""
 interpret(commands::AndCommands) =
     Base.AndCmds(interpret(commands.a), interpret(commands.b))
+"""
+    interpret(commands::OrCommands)
+
+Translate an `OrCommands` object into a `Base.OrCmds` that can be executed, considering the disjunction.
+
+# Examples
+```jldoctest
+julia> c1 = Command("ls", [], [], [], []);
+
+julia> c2 = Command("pwd", [], [], [], []);
+
+julia> oc = OrCommands(c1, c2);
+
+julia> cmd = interpret(oc)
+pipeline(`ls`, stdout=`pwd`)
+
+julia> typeof(cmd)
+Base.OrCmds
+```
+"""
 interpret(commands::OrCommands) = Base.OrCmds(interpret(commands.a), interpret(commands.b))
