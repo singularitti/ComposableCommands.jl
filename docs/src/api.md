@@ -11,7 +11,6 @@ Flag
 Option
 AndCommands
 OrCommands
-CommandPipe
 Redirect
 CommandRedirect
 Command

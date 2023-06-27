@@ -37,13 +37,6 @@ function _show(io::IO, command::Command, indent=0)
         end
     end
 end
-function _show(io::IO, commands::CommandPipe, indent=0)
-    println(io, ' '^(indent * 2), "CommandPipe:")
-    println(io, ' '^((indent + 1) * 2), "Command 1:")
-    _show(io, commands.a, indent + 2)
-    println(io, ' '^((indent + 1) * 2), "Command 2:")
-    return _show(io, commands.b, indent + 2)
-end
 function _show(io::IO, commands::AndCommands, indent=0)
     println(io, ' '^(indent * 2), "AndCommands:")
     println(io, ' '^((indent + 1) * 2), "Command 1:")

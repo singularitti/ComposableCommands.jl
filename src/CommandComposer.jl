@@ -1,7 +1,6 @@
 module CommandComposer
 
-export Flag,
-    Option, AndCommands, OrCommands, CommandPipe, Redirect, CommandRedirect, Command
+export Flag, Option, AndCommands, OrCommands, Redirect, CommandRedirect, Command
 
 abstract type CommandParameter end
 
@@ -77,16 +76,6 @@ end
 Represents a disjunction of two commands (i.e., either command is executed).
 """
 struct OrCommands <: AbstractCommand
-    a::AbstractCommand
-    b::AbstractCommand
-end
-
-"""
-    CommandPipe(a::AbstractCommand, b::AbstractCommand)
-
-Represents a pipeline of two commands (i.e., the output of the first command is used as input to the second command).
-"""
-struct CommandPipe <: AbstractCommand
     a::AbstractCommand
     b::AbstractCommand
 end
