@@ -23,6 +23,18 @@
 [style-img]: https://img.shields.io/badge/code%20style-blue-4495d1.svg
 [style-url]: https://github.com/invenia/BlueStyle
 
+CommandComposer.jl is a Julia package that simplifies the process of interpreting and
+building command-line instructions. It allows you to programmatically construct commands,
+manage command parameters, handle command redirections, and much more. This is particularly
+useful when dealing with complex commands or dynamically generated commands.
+
+## Features
+
+- Abstract representation of command line commands, options, flags, and arguments
+- Support for subcommands and command composition
+- Redirection and pipe handling
+- Intuitive API for building and interpreting commands
+
 The code is [hosted on GitHub](https://github.com/singularitti/CommandComposer.jl),
 with some continuous integration services to test its validity.
 
@@ -64,3 +76,7 @@ guidelines that should be followed when opening pull requests and contributing c
 
 [discussions-url]: https://github.com/singularitti/CommandComposer.jl/discussions
 [issues-url]: https://github.com/singularitti/CommandComposer.jl/issues
+
+## License
+
+CommandComposer.jl is released under the MIT License. See [LICENSE](LICENSE) for details.
