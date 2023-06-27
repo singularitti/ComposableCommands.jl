@@ -69,27 +69,6 @@ function interpret(command::CommandRedirect)
     end
 end
 """
-    interpret(commands::CommandPipe)
-
-Translate a `CommandPipe` object into a `Cmd` that can be executed, considering the piping.
-
-# Examples
-```jldoctest
-julia> c1 = Command("ls", [], [], [], []);
-
-julia> c2 = Command("grep", [], [Option("ignore-case", "i", "ignore case", "txt")], [], []);
-
-julia> cp = CommandPipe(c1, c2);
-
-julia> cmd = interpret(cp)
-pipeline(`ls`, stdout=`grep --ignore-case=txt`)
-
-julia> typeof(cmd)
-Base.OrCmds
-```
-"""
-interpret(commands::CommandPipe) = pipeline(interpret(commands.a), interpret(commands.b))
-"""
     interpret(commands::AndCommands)
 
 Translate an `AndCommands` object into a `Base.AndCmds` that can be executed, considering the conjunction.
