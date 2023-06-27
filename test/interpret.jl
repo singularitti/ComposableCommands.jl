@@ -80,11 +80,11 @@
         @test cmd == pipeline(interpret(git), interpret(ls))
         @test typeof(cmd) == Base.OrCmds
     end
-    @testset "Test `CommandPipe`" begin
+    @testset "Test `OrCommands`" begin
         l = Flag("long-format", "l", "use a long listing format")
         ls = Command("ls", [l], [], [], [])
         grep = Command("grep", [], [], [".bashrc"], [])
-        pipe = CommandPipe(ls, grep)
+        pipe = OrCommands(ls, grep)
         cmd = interpret(pipe)
         @test cmd == pipeline(`ls --long-format`, `grep .bashrc`)
         @test typeof(cmd) == Base.OrCmds
