@@ -12,7 +12,7 @@ Option
 AndCommands
 OrCommands
 Redirect
-CommandRedirect
+RedirectedCommand
 Command
 interpret
 ```

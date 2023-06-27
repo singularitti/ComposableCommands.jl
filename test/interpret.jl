@@ -20,7 +20,7 @@
         force = Flag("force", "f", "ignore nonexistent files and arguments, never prompt")
         # Create Command instance
         rm = Command("rm", [recursive, force], [], ["*.txt"], [])
-        global rm_redirect = CommandRedirect(rm, Redirect(">", "logfile"))
+        global rm_redirect = RedirectedCommand(rm, Redirect(">", "logfile"))
         cmd = interpret(rm_redirect)
         @test cmd == pipeline(`rm --recursive --force '*.txt'`, "logfile")
         @test typeof(cmd) == Base.CmdRedirect
@@ -34,18 +34,18 @@
         @test cmd == `ls --long-format --all --directory`
         @test typeof(cmd) == Cmd
     end
-    @testset "Test `CommandRedirect` for `ls`" begin
-        ls_out = CommandRedirect(ls, Redirect(">", "out.txt"))
+    @testset "Test `RedirectedCommand` for `ls`" begin
+        ls_out = RedirectedCommand(ls, Redirect(">", "out.txt"))
         cmd = interpret(ls_out)
         @test cmd == pipeline(`ls --long-format --all --directory`, "out.txt")
         @test typeof(cmd) == Base.CmdRedirect
     end
-    @testset "Test `CommandRedirect` with both input and output" begin
-        ls_in = CommandRedirect(ls, Redirect("<", "in.txt"))
+    @testset "Test `RedirectedCommand` with both input and output" begin
+        ls_in = RedirectedCommand(ls, Redirect("<", "in.txt"))
         cmd = interpret(ls_in)
         @test cmd == pipeline("in.txt", `ls --long-format --all --directory`)
         @test typeof(cmd) == Base.CmdRedirect
-        ls_in_out = CommandRedirect(ls_in, Redirect(">", "out.txt"))
+        ls_in_out = RedirectedCommand(ls_in, Redirect(">", "out.txt"))
         cmd = interpret(ls_in_out)
         @test cmd == pipeline(
             `ls --long-format --all --directory`; stdin="in.txt", stdout="out.txt"

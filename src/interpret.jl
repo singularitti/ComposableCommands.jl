@@ -39,9 +39,9 @@ function interpret(command::Command)
     return Cmd(exec)
 end
 """
-    interpret(command::CommandRedirect)
+    interpret(command::RedirectedCommand)
 
-Translate a `CommandRedirect` object into a `Base.CmdRedirect` that can be executed, considering the redirection.
+Translate a `RedirectedCommand` object into a `Base.CmdRedirect` that can be executed, considering the redirection.
 
 # Examples
 ```jldoctest
@@ -49,7 +49,7 @@ julia> c = Command("ls", [], [], [], []);
 
 julia> r = Redirect(">", "output.txt");
 
-julia> cr = CommandRedirect(c, r);
+julia> cr = RedirectedCommand(c, r);
 
 julia> cmd = interpret(cr)
 pipeline(`ls`, stdout>Base.FileRedirect("output.txt", false))
@@ -58,7 +58,7 @@ julia> typeof(cmd)
 Base.CmdRedirect
 ```
 """
-function interpret(command::CommandRedirect)
+function interpret(command::RedirectedCommand)
     cmd = interpret(command.command)
     if command.redirect.operator in ("<", "<<")
         return pipeline(command.redirect.target, cmd)

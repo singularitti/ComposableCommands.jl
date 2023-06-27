@@ -1,6 +1,6 @@
 module CommandComposer
 
-export Flag, Option, AndCommands, OrCommands, Redirect, CommandRedirect, Command
+export Flag, Option, AndCommands, OrCommands, Redirect, RedirectedCommand, Command
 
 abstract type CommandParameter end
 
@@ -101,11 +101,11 @@ struct Redirect
 end
 
 """
-    CommandRedirect(command::AbstractCommand, redirect::Redirect)
+    RedirectedCommand(command::AbstractCommand, redirect::Redirect)
 
 Represents a command with an associated redirection.
 """
-struct CommandRedirect <: AbstractCommand
+struct RedirectedCommand <: AbstractCommand
     command::AbstractCommand
     redirect::Redirect
 end
