@@ -1,6 +1,6 @@
 module CommandComposer
 
-export Flag, Option, AndCommands, OrCommands, Redirect, RedirectedCommand, Command
+export Flag, Option, AndCommands, OrCommands, RedirectedCommand, Command
 
 abstract type CommandParameter end
 
@@ -78,26 +78,6 @@ Represents a disjunction of two commands (i.e., either command is executed).
 struct OrCommands <: AbstractCommand
     a::AbstractCommand
     b::AbstractCommand
-end
-
-"""
-    Redirect(operator::String, target::String)
-
-Represents a redirection of command output or input.
-
-# Arguments
-- `operator::String`: the operator for the redirection, can be one of ("<", "<<", ">", ">>", "2>", "&>", ">&", "2>&1").
-- `target::String`: the target file for the redirection.
-"""
-struct Redirect
-    operator::String
-    target::String
-    function Redirect(operator, target)
-        if !(operator in ("<", "<<", ">", ">>", "2>", "&>", ">&", "2>&1"))
-            throw(ArgumentError("operator `$(operator)` is not supported!"))
-        end
-        return new(operator, target)
-    end
 end
 
 """
