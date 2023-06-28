@@ -15,19 +15,7 @@ Create a `Flag` object.
 - `description::String`: a description of the flag for documentation purposes.
 """
 struct Flag <: CommandParameter
-    long_name::String
-    short_name::String
-    description::String
-    function Flag(long_name, short_name, description)
-        if isempty(long_name) && isempty(short_name)
-            throw(
-                ArgumentError(
-                    "at least one of `long_name` or `short_name` must be non-empty!"
-                ),
-            )
-        end
-        return new(long_name, short_name, description)
-    end
+    name::String
 end
 
 """
@@ -42,20 +30,8 @@ Create an `Option` object.
 - `value::Any`: the value assigned to this option.
 """
 struct Option <: CommandParameter
-    long_name::String
-    short_name::String
-    description::String
+    name::String
     value::Any
-    function Option(long_name, short_name, description, value)
-        if isempty(long_name) && isempty(short_name)
-            throw(
-                ArgumentError(
-                    "at least one of `long_name` or `short_name` must be non-empty!"
-                ),
-            )
-        end
-        return new(long_name, short_name, description, value)
-    end
 end
 
 abstract type AbstractCommand end
