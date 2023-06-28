@@ -117,6 +117,16 @@ struct Command <: AbstractCommand
     arguments::Vector{String}
     subcommands::Vector{AbstractCommand}
 end
+# See https://github.com/JuliaLang/julia/blob/27c6d97/base/cmd.jl#L381-L395
+function (command::Command)(stdin=nothing, stdout=nothing)
+    if stdin !== nothing
+        command = RedirectedCommand(stdin, command)
+    end
+    if stdout !== nothing
+        command = RedirectedCommand(command, stdout)
+    end
+    return command
+end
 
 include("show.jl")
 include("interpret.jl")
