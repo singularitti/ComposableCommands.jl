@@ -45,14 +45,18 @@ Translate a `RedirectedCommand` object into a `Base.CmdRedirect` that can be exe
 
 # Examples
 ```jldoctest
-julia> c = Command("ls", [], [], [], []);
+julia> r = RedirectedCommand(Command("ls", [], [], [], []), "output.txt");
 
-julia> r = Redirect(">", "output.txt");
-
-julia> cr = RedirectedCommand(c, r);
-
-julia> cmd = interpret(cr)
+julia> cmd = interpret(r)
 pipeline(`ls`, stdout>Base.FileRedirect("output.txt", false))
+
+julia> typeof(cmd)
+Base.CmdRedirect
+
+julia> r = RedirectedCommand(".zshrc", Command("cat", [], [], [], []));
+
+julia> cmd = interpret(r)
+pipeline(`cat`, stdin<Base.FileRedirect(".zshrc", false))
 
 julia> typeof(cmd)
 Base.CmdRedirect

@@ -11,7 +11,6 @@ Flag
 Option
 AndCommands
 OrCommands
-Redirect
 RedirectedCommand
 Command
 interpret
