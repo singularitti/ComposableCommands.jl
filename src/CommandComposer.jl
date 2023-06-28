@@ -105,10 +105,18 @@ end
 
 Represents a command with an associated redirection.
 """
-struct RedirectedCommand <: AbstractCommand
-    command::AbstractCommand
-    redirect::Redirect
+struct RedirectedCommand{S,D} <: AbstractCommand
+    source::S
+    destination::D
+    function RedirectedCommand{S,D}(source::S, destination::D) where {S,D}
+        if !(S <: AbstractCommand && D <: String || S <: String && D <: AbstractCommand)
+            throw(ArgumentError("source and destination cannot be $S and $D."))
+        end
+        return new{S,D}(source, destination)
+    end
 end
+RedirectedCommand(source::S, destination::D) where {S,D} =
+    RedirectedCommand{S,D}(source, destination)
 
 """
     Command(name, flags, options, arguments, subcommands)
