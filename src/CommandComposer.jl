@@ -1,6 +1,6 @@
 module CommandComposer
 
-export Flag, Option, AndCommands, OrCommands, Redirect, RedirectedCommand, Command
+export Flag, Option, AndCommands, OrCommands, RedirectedCommand, Command
 
 abstract type CommandParameter end
 
@@ -81,34 +81,22 @@ struct OrCommands <: AbstractCommand
 end
 
 """
-    Redirect(operator::String, target::String)
-
-Represents a redirection of command output or input.
-
-# Arguments
-- `operator::String`: the operator for the redirection, can be one of ("<", "<<", ">", ">>", "2>", "&>", ">&", "2>&1").
-- `target::String`: the target file for the redirection.
-"""
-struct Redirect
-    operator::String
-    target::String
-    function Redirect(operator, target)
-        if !(operator in ("<", "<<", ">", ">>", "2>", "&>", ">&", "2>&1"))
-            throw(ArgumentError("operator `$(operator)` is not supported!"))
-        end
-        return new(operator, target)
-    end
-end
-
-"""
     RedirectedCommand(command::AbstractCommand, redirect::Redirect)
 
 Represents a command with an associated redirection.
 """
-struct RedirectedCommand <: AbstractCommand
-    command::AbstractCommand
-    redirect::Redirect
+struct RedirectedCommand{S,D} <: AbstractCommand
+    source::S
+    destination::D
+    function RedirectedCommand{S,D}(source::S, destination::D) where {S,D}
+        if !(S <: AbstractCommand && D <: String || S <: String && D <: AbstractCommand)
+            throw(ArgumentError("source and destination cannot be $S and $D."))
+        end
+        return new{S,D}(source, destination)
+    end
 end
+RedirectedCommand(source::S, destination::D) where {S,D} =
+    RedirectedCommand{S,D}(source, destination)
 
 """
     Command(name, flags, options, arguments, subcommands)
@@ -128,6 +116,16 @@ struct Command <: AbstractCommand
     options::Vector{Option}
     arguments::Vector{String}
     subcommands::Vector{AbstractCommand}
+end
+# See https://github.com/JuliaLang/julia/blob/27c6d97/base/cmd.jl#L381-L395
+function (command::Command)(stdin=nothing, stdout=nothing)
+    if stdin !== nothing
+        command = RedirectedCommand(stdin, command)
+    end
+    if stdout !== nothing
+        command = RedirectedCommand(command, stdout)
+    end
+    return command
 end
 
 include("show.jl")

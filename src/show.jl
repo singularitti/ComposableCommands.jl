@@ -53,9 +53,16 @@ function _show(io::IO, commands::OrCommands, indent=0)
 end
 function _show(io::IO, command::RedirectedCommand, indent=0)
     println(io, ' '^(indent * 2), "RedirectedCommand:")
-    println(io, ' '^((indent + 1) * 2), "Command:")
-    _show(io, command.command, indent + 2)
-    println(io, ' '^((indent + 1) * 2), "Redirect:")
-    println(io, ' '^((indent + 2) * 2), "Operator: ", command.redirect.operator)
-    return println(io, ' '^((indent + 2) * 2), "Target: ", command.redirect.target)
+    println(io, ' '^((indent + 1) * 2), "Source:")
+    if command.source isa AbstractCommand
+        _show(io, command.source, indent + 2)
+    else  # command.source is a String (file)
+        println(io, ' '^((indent + 2) * 2), command.source)
+    end
+    println(io, ' '^((indent + 1) * 2), "Destination:")
+    if command.destination isa AbstractCommand
+        _show(io, command.destination, indent + 2)
+    else  # command.destination is a String (file)
+        println(io, ' '^((indent + 2) * 2), command.destination)
+    end
 end
