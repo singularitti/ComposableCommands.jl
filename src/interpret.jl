@@ -59,11 +59,10 @@ Base.CmdRedirect
 ```
 """
 function interpret(command::RedirectedCommand)
-    cmd = interpret(command.command)
-    if command.redirect.operator in ("<", "<<")
-        return pipeline(command.redirect.target, cmd)
-    elseif command.redirect.operator in (">", ">>", "2>", "&>", ">&", "2>&1")
-        return pipeline(cmd, command.redirect.target)
+    if command.source isa String && command.destination isa AbstractCommand
+        return pipeline(command.source, interpret(command.destination))
+    elseif command.source isa AbstractCommand && command.destination isa String
+        return pipeline(interpret(command.source), command.destination)
     else
         error("this should never happen!")
     end
