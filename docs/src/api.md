@@ -7,8 +7,10 @@ CurrentModule = CommandComposer
 ```
 
 ```@docs
-Flag
-Option
+LongOption
+LongFlag
+ShortOption
+ShortFlag
 AndCommands
 OrCommands
 RedirectedCommand
