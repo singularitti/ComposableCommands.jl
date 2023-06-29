@@ -5,17 +5,37 @@ export ShortFlag,
 
 abstract type CommandParameter end
 abstract type Flag <: CommandParameter end
+"""
+    ShortFlag(name::String)
+
+Represent a short flag associated with a command.
+"""
 struct ShortFlag <: Flag
     name::String
 end
+"""
+    LongFlag(name::String)
+
+Represent a long flag associated with a command.
+"""
 struct LongFlag <: Flag
     name::String
 end
 abstract type Option <: CommandParameter end
+"""
+    ShortOption(name::String, value)
+
+Represent a short option associated with a command.
+"""
 struct ShortOption <: Option
     name::String
     value
 end
+"""
+    LongOption(name::String, value)
+
+Represent a long option associated with a command.
+"""
 struct LongOption <: Option
     name::String
     value
@@ -26,7 +46,7 @@ abstract type AbstractCommand end
 """
     AndCommands(a::AbstractCommand, b::AbstractCommand)
 
-Represents a conjunction of two commands (i.e., both commands are executed).
+Represent a conjunction of two commands (i.e., both commands are executed).
 """
 struct AndCommands <: AbstractCommand
     a::AbstractCommand
@@ -36,7 +56,7 @@ end
 """
     OrCommands(a::AbstractCommand, b::AbstractCommand)
 
-Represents a disjunction of two commands (i.e., either command is executed).
+Represent a disjunction of two commands (i.e., either command is executed).
 """
 struct OrCommands <: AbstractCommand
     a::AbstractCommand
@@ -46,7 +66,7 @@ end
 """
     RedirectedCommand(source, destination)
 
-A `RedirectedCommand` is a wrapper around an `AbstractCommand` or a file (`String`).
+Wrap an `AbstractCommand` and a file (`String`).
 
 It allows output redirection from a command to a file or input redirection from a
 file to a command. The redirection is specified by the `RedirectedCommand`'s
@@ -74,14 +94,13 @@ RedirectedCommand(source::S, destination::D) where {S,D} =
     RedirectedCommand{S,D}(source, destination)
 
 """
-    Command(name, flags, options, arguments, subcommands)
+    Command(name, parameters, arguments, subcommands)
 
-Represents a command to be executed, with associated flags, options, arguments, and subcommands.
+Represent a command to be executed, with associated flags, options, arguments, and subcommands.
 
 # Arguments
 - `name::String`: the name of the command.
-- `flags::Vector{Flag}`: any flags associated with the command.
-- `options::Vector{Option}`: any options associated with the command.
+- `parameters`: an iterable of flags and options.
 - `arguments::Vector{String}`: any arguments to the command.
 - `subcommands::Vector{AbstractCommand}`: any subcommands to be executed in conjunction with the main command.
 """
