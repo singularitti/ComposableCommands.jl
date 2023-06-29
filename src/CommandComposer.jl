@@ -1,5 +1,7 @@
 module CommandComposer
 
+using OrderedCollections: OrderedDict
+
 export ShortFlag,
     LongFlag, ShortOption, LongOption, AndCommands, OrCommands, RedirectedCommand, Command
 
@@ -106,14 +108,14 @@ Represent a command to be executed, with associated flags, options, arguments, a
 """
 struct Command <: AbstractCommand
     name::String
-    parameters::Dict{String,CommandParameter}
+    parameters::OrderedDict{String,CommandParameter}
     arguments::Vector{String}
     subcommands::Vector{AbstractCommand}
     function Command(name, parameters, arguments, subcommands)
-        if parameters isa Dict
+        if parameters isa AbstractDict
             return new(name, parameters, arguments, subcommands)
         else
-            dict = Dict{String,CommandParameter}()
+            dict = OrderedDict{String,CommandParameter}()
             for parameter in parameters
                 if haskey(dict, parameter.name)
                     @warn "duplicate parameter found: $(parameter.name)!"
