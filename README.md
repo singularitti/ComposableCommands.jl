@@ -1,32 +1,38 @@
-# CommandComposer
+# ComposableCommands
 
 |                                 **Documentation**                                  |                                                                                                 **Build Status**                                                                                                 |                                        **Others**                                         |
 | :--------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------: |
 | [![Stable][docs-stable-img]][docs-stable-url] [![Dev][docs-dev-img]][docs-dev-url] | [![Build Status][gha-img]][gha-url] [![Build Status][appveyor-img]][appveyor-url] [![Build Status][cirrus-img]][cirrus-url] [![pipeline status][gitlab-img]][gitlab-url] [![Coverage][codecov-img]][codecov-url] | [![GitHub license][license-img]][license-url] [![Code Style: Blue][style-img]][style-url] |
 
 [docs-stable-img]: https://img.shields.io/badge/docs-stable-blue.svg
-[docs-stable-url]: https://singularitti.github.io/CommandComposer.jl/stable
+[docs-stable-url]: https://singularitti.github.io/ComposableCommands.jl/stable
 [docs-dev-img]: https://img.shields.io/badge/docs-dev-blue.svg
-[docs-dev-url]: https://singularitti.github.io/CommandComposer.jl/dev
-[gha-img]: https://github.com/singularitti/CommandComposer.jl/workflows/CI/badge.svg
-[gha-url]: https://github.com/singularitti/CommandComposer.jl/actions
-[appveyor-img]: https://ci.appveyor.com/api/projects/status/github/singularitti/CommandComposer.jl?svg=true
-[appveyor-url]: https://ci.appveyor.com/project/singularitti/CommandComposer-jl
-[cirrus-img]: https://api.cirrus-ci.com/github/singularitti/CommandComposer.jl.svg
-[cirrus-url]: https://cirrus-ci.com/github/singularitti/CommandComposer.jl
-[gitlab-img]: https://gitlab.com/singularitti/CommandComposer.jl/badges/main/pipeline.svg
-[gitlab-url]: https://gitlab.com/singularitti/CommandComposer.jl/-/pipelines
-[codecov-img]: https://codecov.io/gh/singularitti/CommandComposer.jl/branch/main/graph/badge.svg
-[codecov-url]: https://codecov.io/gh/singularitti/CommandComposer.jl
-[license-img]: https://img.shields.io/github/license/singularitti/CommandComposer.jl
-[license-url]: https://github.com/singularitti/CommandComposer.jl/blob/main/LICENSE
+[docs-dev-url]: https://singularitti.github.io/ComposableCommands.jl/dev
+[gha-img]: https://github.com/singularitti/ComposableCommands.jl/workflows/CI/badge.svg
+[gha-url]: https://github.com/singularitti/ComposableCommands.jl/actions
+[appveyor-img]: https://ci.appveyor.com/api/projects/status/github/singularitti/ComposableCommands.jl?svg=true
+[appveyor-url]: https://ci.appveyor.com/project/singularitti/ComposableCommands-jl
+[cirrus-img]: https://api.cirrus-ci.com/github/singularitti/ComposableCommands.jl.svg
+[cirrus-url]: https://cirrus-ci.com/github/singularitti/ComposableCommands.jl
+[gitlab-img]: https://gitlab.com/singularitti/ComposableCommands.jl/badges/main/pipeline.svg
+[gitlab-url]: https://gitlab.com/singularitti/ComposableCommands.jl/-/pipelines
+[codecov-img]: https://codecov.io/gh/singularitti/ComposableCommands.jl/branch/main/graph/badge.svg
+[codecov-url]: https://codecov.io/gh/singularitti/ComposableCommands.jl
+[license-img]: https://img.shields.io/github/license/singularitti/ComposableCommands.jl
+[license-url]: https://github.com/singularitti/ComposableCommands.jl/blob/main/LICENSE
 [style-img]: https://img.shields.io/badge/code%20style-blue-4495d1.svg
 [style-url]: https://github.com/invenia/BlueStyle
 
-CommandComposer.jl is a Julia package that simplifies the process of interpreting and
+ComposableCommands.jl is a Julia package that simplifies the process of interpreting and
 building command-line instructions. It allows you to programmatically construct commands,
 manage command parameters, handle command redirections, and much more. This is particularly
 useful when dealing with complex commands or dynamically generated commands.
+
+The code is [hosted on GitHub](https://github.com/singularitti/ComposableCommands.jl),
+with some continuous integration services to test its validity.
+
+This repository is created and maintained by [@singularitti](https://github.com/singularitti).
+You are very welcome to contribute.
 
 ## Features
 
@@ -35,25 +41,19 @@ useful when dealing with complex commands or dynamically generated commands.
 - Redirection and pipe handling
 - Intuitive API for building and interpreting commands
 
-The code is [hosted on GitHub](https://github.com/singularitti/CommandComposer.jl),
-with some continuous integration services to test its validity.
-
-This repository is created and maintained by [@singularitti](https://github.com/singularitti).
-You are very welcome to contribute.
-
 ## Installation
 
 The package can be installed with the Julia package manager.
 From the Julia REPL, type `]` to enter the Pkg REPL mode and run:
 
 ```
-pkg> add CommandComposer
+pkg> add ComposableCommands
 ```
 
 Or, equivalently, via the [`Pkg` API](https://pkgdocs.julialang.org/v1/getting-started/):
 
 ```julia
-julia> import Pkg; Pkg.add("CommandComposer")
+julia> import Pkg; Pkg.add("ComposableCommands")
 ```
 
 ## Documentation
@@ -74,9 +74,9 @@ Contributions are very welcome, as are feature requests and suggestions. Please 
 [issue][issues-url] if you encounter any problems. The [Contributing](@ref) page has
 guidelines that should be followed when opening pull requests and contributing code.
 
-[discussions-url]: https://github.com/singularitti/CommandComposer.jl/discussions
-[issues-url]: https://github.com/singularitti/CommandComposer.jl/issues
+[discussions-url]: https://github.com/singularitti/ComposableCommands.jl/discussions
+[issues-url]: https://github.com/singularitti/ComposableCommands.jl/issues
 
 ## License
 
-CommandComposer.jl is released under the MIT License. See [LICENSE](LICENSE) for details.
+ComposableCommands.jl is released under the MIT License. See [LICENSE](LICENSE) for details.
