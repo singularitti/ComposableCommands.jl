@@ -71,6 +71,6 @@ jobs:
       - run: |
           julia --project=docs -e '
             using Documenter: DocMeta, doctest
-            using CommandComposer
-            DocMeta.setdocmeta!(CommandComposer, :DocTestSetup, :(using CommandComposer); recursive=true)
-            doctest(CommandComposer)'
+            using ComposableCommands
+            DocMeta.setdocmeta!(ComposableCommands, :DocTestSetup, :(using ComposableCommands); recursive=true)
+            doctest(ComposableCommands)'
