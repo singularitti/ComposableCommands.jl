@@ -7,10 +7,13 @@ Translate a `Command` object into a `Cmd` that can be executed.
 
 # Examples
 ```jldoctest
-julia> c = Command("ls", [Flag("all", "a", "list all files")], [], [], []);
+julia> c = Command("ls", [LongFlag("all")], [], []);
 
-julia> interpret(c)
+julia> cmd = interpret(c)
 `ls --all`
+
+julia> typeof(cmd)
+Cmd
 ```
 """
 function interpret(command::Command)
@@ -42,7 +45,7 @@ Translate a `RedirectedCommand` object into a `Base.CmdRedirect` that can be exe
 
 # Examples
 ```jldoctest
-julia> r = RedirectedCommand(Command("ls", [], [], [], []), "output.txt");
+julia> r = RedirectedCommand(Command("ls", [], [], []), "output.txt");
 
 julia> cmd = interpret(r)
 pipeline(`ls`, stdout>Base.FileRedirect("output.txt", false))
@@ -50,7 +53,7 @@ pipeline(`ls`, stdout>Base.FileRedirect("output.txt", false))
 julia> typeof(cmd)
 Base.CmdRedirect
 
-julia> r = RedirectedCommand(".zshrc", Command("cat", [], [], [], []));
+julia> r = RedirectedCommand(".zshrc", Command("cat", [], [], []));
 
 julia> cmd = interpret(r)
 pipeline(`cat`, stdin<Base.FileRedirect(".zshrc", false))
@@ -75,9 +78,9 @@ Translate an `AndCommands` object into a `Base.AndCmds` that can be executed, co
 
 # Examples
 ```jldoctest
-julia> c1 = Command("ls", [], [], [], []);
+julia> c1 = Command("ls", [], [], []);
 
-julia> c2 = Command("pwd", [], [], [], []);
+julia> c2 = Command("pwd", [], [], []);
 
 julia> ac = AndCommands(c1, c2);
 
@@ -97,9 +100,9 @@ Translate an `OrCommands` object into a `Base.OrCmds` that can be executed, cons
 
 # Examples
 ```jldoctest
-julia> c1 = Command("ls", [], [], [], []);
+julia> c1 = Command("ls", [], [], []);
 
-julia> c2 = Command("pwd", [], [], [], []);
+julia> c2 = Command("pwd", [], [], []);
 
 julia> oc = OrCommands(c1, c2);
 
