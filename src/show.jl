@@ -4,36 +4,22 @@ show(io::IO, command::AbstractCommand) = _show(io, command, 0)
 
 function _show(io::IO, command::Command, indent=0)
     println(io, ' '^(indent * 2), "Command: ", command.name)
-    if !isempty(command.flags)
-        println(io, ' '^(indent * 2), "Flags:")
-        for flag in command.flags
-            println(io, ' '^((indent + 1) * 2), flag.long_name, "/", flag.short_name)
-        end
-    end
-    if !isempty(command.options)
-        println(io, ' '^(indent * 2), "Options:")
-        for option in command.options
-            println(
-                io,
-                ' '^((indent + 1) * 2),
-                option.long_name,
-                "/",
-                option.short_name,
-                " = ",
-                option.value,
-            )
-        end
-    end
-    if !isempty(command.subcommands)
-        println(io, ' '^(indent * 2), "Subcommands:")
-        for subcommand in command.subcommands
-            _show(io, subcommand, indent + 1)
+    if !isempty(command.parameters)
+        println(io, ' '^(indent * 2), "Parameters:")
+        for parameter in values(command.parameters)
+            println(io, ' '^((indent + 1) * 2), parameter.name)
         end
     end
     if !isempty(command.arguments)
         println(io, ' '^(indent * 2), "Arguments:")
         for argument in command.arguments
             println(io, ' '^((indent + 1) * 2), argument)
+        end
+    end
+    if !isempty(command.subcommands)
+        println(io, ' '^(indent * 2), "Subcommands:")
+        for subcommand in command.subcommands
+            _show(io, subcommand, indent + 1)
         end
     end
 end

@@ -4,64 +4,59 @@
         x.cmd == y.cmd && x.handle == y.handle
 
     @testset "Test `git` with multiple subcommands" begin
-        verbose = Flag("verbose", "v", "Be more verbose")
-        no = Flag("", "n", "Do not query remotes")
-        sh = Command("show", [no], [], ["origin"], [])
-        remote = Command("remote", [verbose], [], [], [sh])
-        global git = Command("git", [], [], [], [remote])
+        verbose = LongFlag("verbose")
+        no = ShortFlag("n")
+        sh = Command("show", [no], ["origin"], [])
+        remote = Command("remote", [verbose], [], [sh])
+        global git = Command("git", [], [], [remote])
         cmd = interpret(git)
         @test cmd == `git remote --verbose show -n origin`
         @test typeof(cmd) == Cmd
     end
     @testset "Test `rm` command with flags" begin
-        recursive = Flag(
-            "recursive", "r", "remove directories and their contents recursively"
-        )
-        force = Flag("force", "f", "ignore nonexistent files and arguments, never prompt")
-        # Create Command instance
-        rm = Command("rm", [recursive, force], [], ["*.txt"], [])
+        recursive = LongFlag("recursive")
+        force = LongFlag("force")
+        rm = Command("rm", [recursive, force], ["*.txt"], [])
         global rm_redirect = RedirectedCommand(rm, "logfile")
         cmd = interpret(rm_redirect)
         @test cmd == pipeline(`rm --recursive --force '*.txt'`, "logfile")
         @test typeof(cmd) == Base.CmdRedirect
     end
     @testset "Test `ls` command with flags" begin
-        l = Flag("long-format", "l", "use a long listing format")
-        a = Flag("all", "a", "do not ignore entries starting with .")
-        d = Flag("directory", "d", "list directories themselves, not their contents")
-        global ls = Command("ls", [l, a, d], [], [], [])
+        l = ShortFlag("l")
+        a = ShortFlag("a")
+        d = LongFlag("directory")
+        global ls = Command("ls", [l, a, d], [], [])
         cmd = interpret(ls)
-        @test cmd == `ls --long-format --all --directory`
+        @test cmd == `ls -l -a --directory`
         @test typeof(cmd) == Cmd
     end
     @testset "Test `RedirectedCommand` for `ls`" begin
         ls_out = RedirectedCommand(ls, "out.txt")
         cmd = interpret(ls_out)
-        @test cmd == pipeline(`ls --long-format --all --directory`, "out.txt")
+        @test cmd == pipeline(`ls -l -a --directory`, "out.txt")
         @test typeof(cmd) == Base.CmdRedirect
     end
     @testset "Test `RedirectedCommand` with both input and output" begin
         ls_in = RedirectedCommand("in.txt", ls)
         cmd = interpret(ls_in)
-        @test cmd == pipeline("in.txt", `ls --long-format --all --directory`)
+        @test cmd == pipeline("in.txt", `ls -l -a --directory`)
         @test typeof(cmd) == Base.CmdRedirect
         ls_in_out = RedirectedCommand(ls_in, "out.txt")
         @test ls_in_out == ls("in.txt", "out.txt")
         cmd = interpret(ls_in_out)
-        @test cmd == pipeline(
-            `ls --long-format --all --directory`; stdin="in.txt", stdout="out.txt"
-        )
+        @test cmd == pipeline(`ls -l -a --directory`; stdin="in.txt", stdout="out.txt")
         @test typeof(cmd) == Base.CmdRedirect
     end
     @testset "Test `grep` command with an option and value" begin
-        aft = Option("after-context", "A", "print NUM lines of trailing context", 3)
-        grep = Command("grep", [], [aft], ["pattern", "file.txt"], [])
+        aft = LongOption("after-context", 3)
+        grep = Command("grep", [aft], ["pattern", "file.txt"], [])
         cmd = interpret(grep)
         @test cmd == `grep --after-context=3 pattern file.txt`
         @test typeof(cmd) == Cmd
         @testset "Test `grep` command with a short option and value" begin
-            aft = Option("", "A", "print NUM lines of trailing context", 3)
-            grep = Command("grep", [], [aft], ["pattern", "file.txt"], [])
+            aft = ShortOption("A", 3)
+            grep = Command("grep", [aft], ["pattern", "file.txt"], [])
             cmd = interpret(grep)
             @test cmd == `grep -A 3 pattern file.txt`
             @test typeof(cmd) == Cmd
@@ -82,12 +77,10 @@
         @test typeof(cmd) == Base.OrCmds
     end
     @testset "Test `OrCommands`" begin
-        l = Flag("long-format", "l", "use a long listing format")
-        ls = Command("ls", [l], [], [], [])
-        grep = Command("grep", [], [], [".bashrc"], [])
+        grep = Command("grep", [], [".bashrc"], [])
         pipe = OrCommands(ls, grep)
         cmd = interpret(pipe)
-        @test cmd == pipeline(`ls --long-format`, `grep .bashrc`)
+        @test cmd == pipeline(`ls -l -a --directory`, `grep .bashrc`)
         @test typeof(cmd) == Base.OrCmds
     end
 end
