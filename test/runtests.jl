@@ -1,6 +1,6 @@
-using CommandComposer
+using ComposableCommands
 using Test
 
-@testset "CommandComposer.jl" begin
+@testset "ComposableCommands.jl" begin
     include("interpret.jl")
 end
