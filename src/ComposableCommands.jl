@@ -1,4 +1,4 @@
-module CommandComposer
+module ComposableCommands
 
 using OrderedCollections: OrderedDict
 
