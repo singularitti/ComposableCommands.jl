@@ -15,18 +15,15 @@ julia> interpret(c)
 """
 function interpret(command::Command)
     exec = [command.name]
-    for option in command.options
-        if isempty(option.long_name)
-            push!(exec, "-$(option.short_name)", string(option.value))
-        else
-            push!(exec, "--$(option.long_name)=$(option.value)")
-        end
-    end
-    for flag in command.flags
-        if isempty(flag.long_name)
-            push!(exec, "-$(flag.short_name)")
-        else
-            push!(exec, "--$(flag.long_name)")
+    for parameter in values(command.parameters)
+        if parameter isa ShortOption
+            push!(exec, "-$(parameter.name)", string(parameter.value))
+        elseif parameter isa LongOption
+            push!(exec, "--$(parameter.name)=$(parameter.value)")
+        elseif parameter isa ShortFlag
+            push!(exec, "-$(parameter.name)")
+        elseif parameter isa LongFlag
+            push!(exec, "--$(parameter.name)")
         end
     end
     for arg in command.arguments
