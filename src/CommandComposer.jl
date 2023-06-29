@@ -1,37 +1,24 @@
 module CommandComposer
 
-export Flag, Option, AndCommands, OrCommands, RedirectedCommand, Command
+export ShortFlag,
+    LongFlag, ShortOption, LongOption, AndCommands, OrCommands, RedirectedCommand, Command
 
 abstract type CommandParameter end
-
-"""
-    Flag(long_name, short_name, description)
-
-Create a `Flag` object.
-
-# Arguments
-- `long_name::String`: the full name of the flag, e.g. "recursive" for a `-r` flag.
-- `short_name::String`: the short, usually single-letter, name of the flag, e.g. "r" for a `--recursive` flag.
-- `description::String`: a description of the flag for documentation purposes.
-"""
-struct Flag <: CommandParameter
+abstract type Flag <: CommandParameter end
+struct ShortFlag <: Flag
     name::String
 end
-
-"""
-    Option(long_name, short_name, description, value)
-
-Create an `Option` object.
-
-# Arguments
-- `long_name::String`: the full name of the option, e.g. "file" for a `-f` option.
-- `short_name::String`: the short, usually single-letter, name of the option, e.g. "f" for a `--file` option.
-- `description::String`: a description of the option for documentation purposes.
-- `value::Any`: the value assigned to this option.
-"""
-struct Option <: CommandParameter
+struct LongFlag <: Flag
     name::String
-    value::Any
+end
+abstract type Option <: CommandParameter end
+struct ShortOption <: Option
+    name::String
+    value
+end
+struct LongOption <: Option
+    name::String
+    value
 end
 
 abstract type AbstractCommand end
