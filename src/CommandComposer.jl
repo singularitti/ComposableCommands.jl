@@ -100,10 +100,23 @@ Represents a command to be executed, with associated flags, options, arguments, 
 """
 struct Command <: AbstractCommand
     name::String
-    flags::Vector{Flag}
-    options::Vector{Option}
+    parameters::Dict{String,CommandParameter}
     arguments::Vector{String}
     subcommands::Vector{AbstractCommand}
+    function Command(name, parameters, arguments, subcommands)
+        if parameters isa Dict
+            return new(name, parameters, arguments, subcommands)
+        else
+            dict = Dict{String,CommandParameter}()
+            for parameter in parameters
+                if haskey(dict, parameter.name)
+                    @warn "duplicate parameter found: $(parameter.name)!"
+                end
+                dict[parameter.name] = parameter
+            end
+            return new(name, dict, arguments, subcommands)
+        end
+    end
 end
 # See https://github.com/JuliaLang/julia/blob/27c6d97/base/cmd.jl#L381-L395
 function (command::Command)(stdin=nothing, stdout=nothing)
