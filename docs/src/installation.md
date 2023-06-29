@@ -6,7 +6,7 @@ Depth = 2
 ```
 
 Here are the installation instructions for package
-[CommandComposer](https://github.com/singularitti/CommandComposer.jl).
+[ComposableCommands](https://github.com/singularitti/ComposableCommands.jl).
 If you have trouble installing it, please refer to our [Troubleshooting](@ref) page
 for more information.
 
@@ -87,7 +87,7 @@ installed on your machine. For Mac computers with M-series processors, this pack
 dependencies may not work. Please install the Intel-compatible version of Julia (for macOS
 x86-64) if any platform-related error occurs.
 
-## Install CommandComposer
+## Install ComposableCommands
 
 Now I am using [macOS](https://en.wikipedia.org/wiki/MacOS) as a standard
 platform to explain the following steps:
@@ -102,13 +102,13 @@ platform to explain the following steps:
 
    julia> Pkg.update()
 
-   julia> Pkg.add("CommandComposer")
+   julia> Pkg.add("ComposableCommands")
    ```
 
 3. Run
 
    ```julia-repl
-   julia> using CommandComposer
+   julia> using ComposableCommands
    ```
 
    and have fun!
@@ -116,32 +116,32 @@ platform to explain the following steps:
 4. While using, please keep this Julia session alive. Restarting might cost some time.
 
 If you want to install the latest in-development (probably buggy)
-version of CommandComposer, type
+version of ComposableCommands, type
 
 ```@repl
 using Pkg
 Pkg.update()
-pkg"add https://github.com/singularitti/CommandComposer.jl"
+pkg"add https://github.com/singularitti/ComposableCommands.jl"
 ```
 
 in the second step above.
 
-## Update CommandComposer
+## Update ComposableCommands
 
 Please [watch](https://docs.github.com/en/account-and-profile/managing-subscriptions-and-notifications-on-github/setting-up-notifications/configuring-notifications#configuring-your-watch-settings-for-an-individual-repository)
-our [GitHub repository](https://github.com/singularitti/CommandComposer.jl)
+our [GitHub repository](https://github.com/singularitti/ComposableCommands.jl)
 for new releases.
-Once we release a new version, you can update CommandComposer by typing
+Once we release a new version, you can update ComposableCommands by typing
 
 ```@repl
 using Pkg
-Pkg.update("CommandComposer")
+Pkg.update("ComposableCommands")
 Pkg.gc()
 ```
 
 in the Julia REPL.
 
-## Uninstall and reinstall CommandComposer
+## Uninstall and reinstall ComposableCommands
 
 Sometimes errors may occur if the package is not properly installed.
 In this case, you may want to uninstall and reinstall the package. Here is how to do that:
@@ -151,10 +151,10 @@ In this case, you may want to uninstall and reinstall the package. Here is how t
    ```julia-repl
    julia> using Pkg
 
-   julia> Pkg.rm("CommandComposer")
+   julia> Pkg.rm("ComposableCommands")
 
    julia> Pkg.gc()
    ```
 
 2. Press `ctrl+d` to quit the current session. Start a new Julia session and
-   reinstall CommandComposer.
+   reinstall ComposableCommands.

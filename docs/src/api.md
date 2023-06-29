@@ -1,9 +1,9 @@
 # API Reference
 
-## `CommandComposer` module
+## `ComposableCommands` module
 
 ```@meta
-CurrentModule = CommandComposer
+CurrentModule = ComposableCommands
 ```
 
 ```@docs

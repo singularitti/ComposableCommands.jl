@@ -14,8 +14,8 @@ before contributing to this package.
 If not following, your pull requests may not be accepted.
 
 !!! info
-    The style guide is always a work in progress, and not all CommandComposer code
-    follows the rules. When modifying CommandComposer, please fix the style violations
+    The style guide is always a work in progress, and not all ComposableCommands code
+    follows the rules. When modifying ComposableCommands, please fix the style violations
     of the surrounding code (i.e., leave the code tidier than when you
     started). If large changes are needed, consider separating them into
     another pull request.
@@ -24,12 +24,12 @@ If not following, your pull requests may not be accepted.
 
 ### Run JuliaFormatter
 
-CommandComposer uses [JuliaFormatter](https://github.com/domluna/JuliaFormatter.jl) as
+ComposableCommands uses [JuliaFormatter](https://github.com/domluna/JuliaFormatter.jl) as
 an auto-formatting tool.
 
-We use the options contained in [`.JuliaFormatter.toml`](https://github.com/singularitti/CommandComposer.jl/blob/main/.JuliaFormatter.toml).
+We use the options contained in [`.JuliaFormatter.toml`](https://github.com/singularitti/ComposableCommands.jl/blob/main/.JuliaFormatter.toml).
 
-To format your code, `cd` to the CommandComposer directory, then run:
+To format your code, `cd` to the ComposableCommands directory, then run:
 
 ```@repl
 using Pkg
@@ -41,7 +41,7 @@ format("test")
 ```
 
 !!! info
-    A continuous integration check verifies that all PRs made to CommandComposer have
+    A continuous integration check verifies that all PRs made to ComposableCommands have
     passed the formatter.
 
 The following sections outline extra style guide points that are not fixed

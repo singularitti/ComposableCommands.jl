@@ -1,12 +1,12 @@
 ```@meta
-CurrentModule = CommandComposer
+CurrentModule = ComposableCommands
 ```
 
-# CommandComposer
+# ComposableCommands
 
-Documentation for [CommandComposer](https://github.com/singularitti/CommandComposer.jl).
+Documentation for [ComposableCommands](https://github.com/singularitti/ComposableCommands.jl).
 
-CommandComposer.jl is a Julia package that simplifies the process of interpreting and
+ComposableCommands.jl is a Julia package that simplifies the process of interpreting and
 building command-line instructions. It allows you to programmatically construct commands,
 manage command parameters, handle command redirections, and much more. This is particularly
 useful when dealing with complex commands or dynamically generated commands.
@@ -21,7 +21,7 @@ useful when dealing with complex commands or dynamically generated commands.
 See the [Index](@ref main-index) for the complete list of documented functions
 and types.
 
-The code is [hosted on GitHub](https://github.com/singularitti/CommandComposer.jl),
+The code is [hosted on GitHub](https://github.com/singularitti/ComposableCommands.jl),
 with some continuous integration services to test its validity.
 
 This repository is created and maintained by [@singularitti](https://github.com/singularitti).
@@ -33,19 +33,19 @@ The package can be installed with the Julia package manager.
 From the Julia REPL, type `]` to enter the Pkg REPL mode and run:
 
 ```julia
-pkg> add CommandComposer
+pkg> add ComposableCommands
 ```
 
 Or, equivalently, via the `Pkg` API:
 
 ```@repl
-import Pkg; Pkg.add("CommandComposer")
+import Pkg; Pkg.add("ComposableCommands")
 ```
 
 ## Documentation
 
-- [**STABLE**](https://singularitti.github.io/CommandComposer.jl/stable) — **documentation of the most recently tagged version.**
-- [**DEV**](https://singularitti.github.io/CommandComposer.jl/dev) — _documentation of the in-development version._
+- [**STABLE**](https://singularitti.github.io/ComposableCommands.jl/stable) — **documentation of the most recently tagged version.**
+- [**DEV**](https://singularitti.github.io/ComposableCommands.jl/dev) — _documentation of the in-development version._
 
 ## Project status
 
@@ -55,10 +55,10 @@ macOS, and Windows.
 ## Questions and contributions
 
 Usage questions can be posted on
-[our discussion page](https://github.com/singularitti/CommandComposer.jl/discussions).
+[our discussion page](https://github.com/singularitti/ComposableCommands.jl/discussions).
 
 Contributions are very welcome, as are feature requests and suggestions. Please open an
-[issue](https://github.com/singularitti/CommandComposer.jl/issues)
+[issue](https://github.com/singularitti/ComposableCommands.jl/issues)
 if you encounter any problems. The [Contributing](@ref) page has
 a few guidelines that should be followed when opening pull requests and contributing code.
 

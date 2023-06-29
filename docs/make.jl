@@ -1,16 +1,16 @@
-using CommandComposer
+using ComposableCommands
 using Documenter
 
-DocMeta.setdocmeta!(CommandComposer, :DocTestSetup, :(using CommandComposer); recursive=true)
+DocMeta.setdocmeta!(ComposableCommands, :DocTestSetup, :(using ComposableCommands); recursive=true)
 
 makedocs(;
-    modules=[CommandComposer],
+    modules=[ComposableCommands],
     authors="singularitti <singularitti@outlook.com> and contributors",
-    repo="https://github.com/singularitti/CommandComposer.jl/blob/{commit}{path}#{line}",
-    sitename="CommandComposer.jl",
+    repo="https://github.com/singularitti/ComposableCommands.jl/blob/{commit}{path}#{line}",
+    sitename="ComposableCommands.jl",
     format=Documenter.HTML(;
         prettyurls=get(ENV, "CI", "false") == "true",
-        canonical="https://singularitti.github.io/CommandComposer.jl",
+        canonical="https://singularitti.github.io/ComposableCommands.jl",
         edit_link="main",
         assets=String[],
     ),
@@ -30,6 +30,6 @@ makedocs(;
 )
 
 deploydocs(;
-    repo="github.com/singularitti/CommandComposer.jl",
+    repo="github.com/singularitti/ComposableCommands.jl",
     devbranch="main",
 )
