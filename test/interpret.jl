@@ -83,22 +83,66 @@
         @test cmd == pipeline(`ls -l -a --directory`, `grep .bashrc`)
         @test typeof(cmd) == Base.OrCmds
     end
+
+    # ===== tree interface checks =====
     @testset "Tree interface" begin
         using AbstractTrees
+
+        # reuse previously defined git/remote/show
+        # directly constructing the iterator should succeed now
         nodes = collect(TreeIterator(git))
         @test length(nodes) == 2
         @test nodes[1] === git
         @test nodes[2] === remote
+
+        # convenience wrapper exported by package
         @test allnodes(git) == nodes
+
+        # iterable command (for loop) should produce same sequence
         collected = AbstractVector{Any}()
         for n in git
             push!(collected, n)
         end
         @test collected == nodes
+
+        # iterating from a descendant is allowed too
+        sub = remote
+        subnodes = collect(TreeIterator(sub))
+        @test subnodes == [sub, sh]
+        @test allnodes(sub) == subnodes
+
+        # complex nested/redirection example (ibrun -n $ncpu $VASP >& output.log)
+        ncpu = 8
+        vasp = Command("vasp", [], [], [])
+        ibrun = Command("ibrun", [ShortOption("n", ncpu)], [], [vasp])
+        redir = RedirectedCommand(ibrun, "output.log")
+        @test allnodes(redir) == [redir, ibrun]
+        io = IOBuffer(); print_tree(io, redir);
+        str = String(take!(io))
+        @test occursin("ibrun", str)
+        @test occursin("-n 8", str)            # option shown
+        @test occursin("vasp", str)           # argument shown
+        @test occursin("> output.log", str)   # redirect label now shell-like
+
+        # a pipe should render as a `|` node with both sides expanded
+        left = Command("echo", [], ["hello"], [])
+        right = Command("grep", [], ["h"], [])
+        pipe = OrCommands(left, right)
+        io2 = IOBuffer(); print_tree(io2, pipe); out2 = String(take!(io2))
+        @test occursin("|", out2)                  # pipe symbol at root
+        @test occursin("echo hello", out2)         # left child shown
+        @test occursin("grep h", out2)            # right child shown
+
         io = IOBuffer()
         print_tree(io, git)
         str = String(take!(io))
         @test occursin("git", str)
+        @test occursin("--verbose", str)        # flag shown inline
         @test occursin("└─ remote", str)
+
+        # `AndCommands` should show shell '&&' operator
+        and = AndCommands(git, ls)
+        io_and = IOBuffer(); print_tree(io_and, and); out_and = String(take!(io_and))
+        @test occursin("&&", out_and)
     end
 end
