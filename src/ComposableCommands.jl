@@ -31,8 +31,9 @@ Represent a short option associated with a command.
 """
 struct ShortOption <: Option
     name::String
-    value
+    value::String
 end
+ShortOption(name::String, value) = ShortOption(name, as_string(value))
 """
     LongOption(name::String, value)
 
@@ -40,9 +41,9 @@ Represent a long option associated with a command.
 """
 struct LongOption <: Option
     name::String
-    value
+    value::String
 end
-
+LongOption(name::String, value) = LongOption(name, as_string(value))
 abstract type AbstractCommand end
 
 """
@@ -50,9 +51,9 @@ abstract type AbstractCommand end
 
 Represent a conjunction of two commands (i.e., both commands are executed).
 """
-struct AndCommands <: AbstractCommand
-    a::AbstractCommand
-    b::AbstractCommand
+struct AndCommands{A<:AbstractCommand,B<:AbstractCommand} <: AbstractCommand
+    a::A
+    b::B
 end
 
 """
@@ -60,9 +61,9 @@ end
 
 Represent a disjunction of two commands (i.e., either command is executed).
 """
-struct OrCommands <: AbstractCommand
-    a::AbstractCommand
-    b::AbstractCommand
+struct OrCommands{A<:AbstractCommand,B<:AbstractCommand} <: AbstractCommand
+    a::A
+    b::B
 end
 
 """
@@ -136,6 +137,11 @@ function (command::Command)(stdin=nothing, stdout=nothing)
     end
     return command
 end
+
+as_string(any) = string(any)
+as_string(str::AbstractString) = str
+as_string(vals::AbstractVector) = join(vals, ",")
+as_string(vals::Tuple) = join(values(vals), ",")
 
 include("show.jl")
 include("interpret.jl")
