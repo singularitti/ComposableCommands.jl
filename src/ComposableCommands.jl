@@ -51,9 +51,9 @@ abstract type AbstractCommand end
 
 Represent a conjunction of two commands (i.e., both commands are executed).
 """
-struct AndCommands <: AbstractCommand
-    a::AbstractCommand
-    b::AbstractCommand
+struct AndCommands{A<:AbstractCommand,B<:AbstractCommand} <: AbstractCommand
+    a::A
+    b::B
 end
 
 """
@@ -61,9 +61,9 @@ end
 
 Represent a disjunction of two commands (i.e., either command is executed).
 """
-struct OrCommands <: AbstractCommand
-    a::AbstractCommand
-    b::AbstractCommand
+struct OrCommands{A<:AbstractCommand,B<:AbstractCommand} <: AbstractCommand
+    a::A
+    b::B
 end
 
 """
