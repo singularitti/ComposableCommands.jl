@@ -83,4 +83,22 @@
         @test cmd == pipeline(`ls -l -a --directory`, `grep .bashrc`)
         @test typeof(cmd) == Base.OrCmds
     end
+    @testset "Tree interface" begin
+        using AbstractTrees
+        nodes = collect(TreeIterator(git))
+        @test length(nodes) == 2
+        @test nodes[1] === git
+        @test nodes[2] === remote
+        @test allnodes(git) == nodes
+        collected = AbstractVector{Any}()
+        for n in git
+            push!(collected, n)
+        end
+        @test collected == nodes
+        io = IOBuffer()
+        print_tree(io, git)
+        str = String(take!(io))
+        @test occursin("git", str)
+        @test occursin("└─ remote", str)
+    end
 end

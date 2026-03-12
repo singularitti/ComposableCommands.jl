@@ -3,7 +3,14 @@ module ComposableCommands
 using OrderedCollections: OrderedDict
 
 export ShortFlag,
-    LongFlag, ShortOption, LongOption, AndCommands, OrCommands, RedirectedCommand, Command
+    LongFlag,
+    ShortOption,
+    LongOption,
+    AndCommands,
+    OrCommands,
+    RedirectedCommand,
+    Command,
+    allnodes
 
 abstract type CommandParameter end
 abstract type Flag <: CommandParameter end
@@ -143,6 +150,7 @@ as_string(str::AbstractString) = str
 as_string(vals::AbstractVector) = join(vals, ",")
 as_string(vals::Tuple) = join(values(vals), ",")
 
+include("tree.jl")
 include("show.jl")
 include("interpret.jl")
 
