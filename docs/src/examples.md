@@ -62,3 +62,66 @@ job_cmd = RedirectedCommand(ibrun_cmd, "output.log")
 collectnodes(job_cmd)
 print_tree(job_cmd)
 ```
+
+## Other examples
+
+The following snippets show how you can build commands equivalent to common
+`slurm` invocations and a `singularity` shell command.  The goal is to
+construct the same argument lists programmatically.
+
+```@repl
+using ComposableCommands
+
+srun1 = Command("srun",
+                [ShortOption("N", 2), ShortOption("B", "4-4:2-2")],
+                ["a.out"],
+                [])  # srun -N2 -B 4-4:2-2 a.out
+interpret(srun1)
+
+server = Command("server", [ShortOption("n", 16), LongOption("mem-per-cpu", "1gb")], [], [])
+client = Command("client", [], [], [])
+srun2 = Command("srun",
+                [ShortOption("n", 1), ShortOption("c", 8),
+                 LongOption("mem-per-cpu", "2gb")],
+                [],
+                [server, client])  # srun -n1 -c8 --mem-per-cpu=2gb server : -n16 --mem-per-cpu=1gb client
+interpret(srun2)
+
+srun3 = Command("srun",
+                [LongOption("nodes", [1, 5, 9, 13])],
+                ["./test"],
+                [])  # srun --nodes=1,5,9,13 ./test
+interpret(srun3)
+
+sinfo = Command("sinfo",
+                [ShortFlag("N"),
+                 ShortOption("O", ("nodelist", "partition", "cpusstate", "memory", "allocmem", "freemem"))],
+                [],
+                [])  # sinfo -N -O nodelist,partition,cpusstate,memory,allocmem,freemem
+interpret(sinfo)
+
+sbatch = Command("sbatch",
+                 [LongOption("time", "25-00:00:00")],
+                 ["my_short_script.sh"],
+                 [])  # sbatch --time 25-00:00:00 my_short_script.sh
+interpret(sbatch)
+
+scontrol = Command("scontrol",
+                    [],
+                    ["update", "JobId=12345678", "TimeLimit=25-00:00:00"],
+                    [])  # scontrol update JobId=12345678 TimeLimit=25-00:00:00
+interpret(scontrol)
+
+squeue = Command("squeue",
+                  [ShortOption("o", "%.18i %.9P %.70j %.8u %.2t %.10M %.6D %4C %10m %15R %20p %7q %Z")],
+                  [],
+                  [])  # squeue -o "%.18i %.9P %.70j %.8u %.2t %.10M %.6D %4C %10m %15R %20p %7q %Z"
+interpret(squeue)
+
+srun_gpu = Command("srun",
+                   [LongOption("gpus", 1), ShortOption("p", "gpu"),
+                    LongFlag("pty")],
+                   ["bash"],
+                   [])  # srun --gpus 1 -p gpu --pty bash
+interpret(srun_gpu)
+```
