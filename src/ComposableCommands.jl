@@ -11,8 +11,7 @@ export ShortFlag,
     OrCommands,
     RedirectedCommand,
     Command,
-    collectnodes,
-    allnodes
+    collectnodes
 
 abstract type CommandParameter end
 abstract type Flag <: CommandParameter end
