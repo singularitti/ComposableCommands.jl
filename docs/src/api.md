@@ -16,4 +16,5 @@ OrCommands
 RedirectedCommand
 Command
 interpret
+collectnodes
 ```
