@@ -1,6 +1,6 @@
 name = "ComposableCommands"
 uuid = "b5b47461-4a42-4db3-bdf2-684fadd57bc3"
-version = "0.2.0"
+version = "0.3.0"
 authors = ["singularitti <singularitti@outlook.com> and contributors"]
 
 [deps]
