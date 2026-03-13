@@ -58,6 +58,25 @@
             @test typeof(cmd) == Cmd
         end
     end
+    @testset "Test Slurm-style options (exercises as_string)" begin
+        srun = Command("srun", [LongOption("nodes", [1, 5, 9, 13])], ["./test"], [])
+        cmd = interpret(srun)
+        @test cmd == `srun --nodes=1,5,9,13 ./test`
+        sinfo = Command(
+            "sinfo",
+            [
+                ShortFlag("N"),
+                ShortOption(
+                    "O",
+                    ("nodelist", "partition", "cpusstate", "memory", "allocmem", "freemem"),
+                ),
+            ],
+            [],
+            [],
+        )
+        cmd2 = interpret(sinfo)
+        @test cmd2 == `sinfo -N -O nodelist,partition,cpusstate,memory,allocmem,freemem`
+    end
     @testset "Test `AndCommands`" begin
         and = AndCommands(git, rm_redirect)
         cmd = interpret(and)

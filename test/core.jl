@@ -18,3 +18,14 @@ Base.:(==)(x::Base.CmdRedirect, y::Base.CmdRedirect) =
     @test AndCommands(git_a, show_a) == AndCommands(git_b, show_b)
     @test OrCommands(git_a, show_a) == OrCommands(git_b, show_b)
 end
+
+@testset "Test `as_string` conversions" begin
+    @test as_string(42) == "42"
+    @test as_string(SubString("hello world", 1, 5)) == "hello"
+    @test as_string([1, 2, 3.0]) == "1,2,3.0"
+    @test as_string(("a", "b", "c")) == "a,b,c"
+    opt1 = ShortOption("n", [1, 2])
+    opt2 = LongOption("nodes", ("a", "b"))
+    @test opt1.value == "1,2"
+    @test opt2.value == "a,b"
+end
