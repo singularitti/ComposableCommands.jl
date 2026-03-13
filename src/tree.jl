@@ -1,30 +1,46 @@
-# tree.jl: provide an AbstractTrees.jl interface for command objects
+using AbstractTrees:
+    AbstractTrees,
+    ImplicitParents,
+    ImplicitSiblings,
+    IndexedChildren,
+    NodeTypeUnknown,
+    PreOrderDFS
 
-using AbstractTrees
+import AbstractTrees:
+    children,
+    nodevalue,
+    ParentLinks,
+    SiblingLinks,
+    ChildIndexing,
+    NodeType,
+    nodetype,
+    childrentype,
+    childtype,
+    childstatetype,
+    printnode,
+    TreeIterator,
+    parent,
+    treesize,
+    treebreadth,
+    treeheight
 
-# -- children ---------------------------------------------------------------
-# the natural hierarchy of a command is its subcommands; other composite
-# command types expose their components as children as well.  we filter out
-# `nothing` from redirects so `print_tree` doesn't show empty branches.
-AbstractTrees.children(cmd::Command) = cmd.subcommands
-AbstractTrees.children(c::AndCommands) = (c.a, c.b)
-AbstractTrees.children(c::OrCommands) = (c.a, c.b)
-AbstractTrees.children(r::RedirectedCommand) = filter(
-    !isnothing,
-    (
-        (r.source isa AbstractCommand ? r.source : nothing),
-        (r.destination isa AbstractCommand ? r.destination : nothing),
-    ),
-)
+# Children
+# The natural hierarchy of a command is its subcommands. Other composite
+# command types expose their components as children as well.
+children(cmd::Command) = cmd.subcommands
+children(c::AndCommands) = (c.a, c.b)
+children(c::OrCommands) = (c.a, c.b)
+children(r::RedirectedCommand{<:AbstractCommand,<:String}) = (r.source,)
+children(r::RedirectedCommand{<:String,<:AbstractCommand}) = (r.destination,)
 
-# -- node values -----------------------------------------------------------
-# what gets printed at each node when using `print_tree`.  by default the
-# object itself would be shown, which is rarely what the user wants; for
-# `Command` we prefer to render the name together with its *parameters* and
-# *arguments* on a single line, and only show subcommands as children.
-function _cmdlabel(cmd::Command)
+# Node values
+# These labels are printed by `print_tree`. By default the object itself would
+# be shown, which is rarely what the user wants. For `Command`, we render the
+# name together with its parameters and arguments on a single line, and only
+# show subcommands as children.
+function _commandlabel(cmd::Command)
     parts = String[cmd.name]
-    # parameters (flags/options) follow shell syntax
+    # Parameters follow shell syntax
     for p in values(cmd.parameters)
         if p isa ShortFlag
             push!(parts, "-" * p.name)
@@ -36,23 +52,18 @@ function _cmdlabel(cmd::Command)
             push!(parts, "--" * p.name * "=" * string(p.value))
         end
     end
-    # positional arguments come last
+    # Positional arguments come last.
     append!(parts, cmd.arguments)
     return join(parts, ' ')
 end
 
-AbstractTrees.nodevalue(cmd::Command) = _cmdlabel(cmd)
-
-# composite operations should use familiar shell operators rather than
-# Julia-specific notation.  note that `AndCommands` here does *not* implement
-# shell `&&` semantics (see discussion in docs/tests) but displaying `&&`
-# is more shell-like than Julia's `&`.
-AbstractTrees.nodevalue(::AndCommands) = "&&"
-AbstractTrees.nodevalue(::OrCommands) = "|"          # pipe
-
-# redirect nodes simply show the direction and filename; the actual command
-# appears as a child if it is an AbstractCommand.
-function AbstractTrees.nodevalue(r::RedirectedCommand)
+nodevalue(cmd::Command) = _commandlabel(cmd)
+# Composite operations use compact shell-like labels in tree output
+nodevalue(::AndCommands) = "&&"
+nodevalue(::OrCommands) = "|"
+# Redirect nodes show the direction and filename. The actual command appears as
+# a child if it is an `AbstractCommand`.
+function nodevalue(r::RedirectedCommand)
     if r.source isa AbstractCommand && r.destination isa String
         return "> " * r.destination
     elseif r.source isa String && r.destination isa AbstractCommand
@@ -62,32 +73,88 @@ function AbstractTrees.nodevalue(r::RedirectedCommand)
     end
 end
 
-# -- traits ----------------------------------------------------------------
-# guarantee that every node in the tree is some subtype of AbstractCommand;
-# this ensures type stability for `TreeIterator` and related helpers.
-AbstractTrees.NodeType(::Type{<:AbstractCommand}) = HasNodeType()
-AbstractTrees.nodetype(::Type{<:AbstractCommand}) = AbstractCommand
+# Traits
+# Command trees are heterogeneous: a `RedirectedCommand` can contain a
+# `Command`, `AndCommands`, or `OrCommands`. Declaring the node type unknown
+# ensures AbstractTrees uses cursors that can traverse mixed node types.
+ParentLinks(::Type{<:AbstractCommand}) = ImplicitParents()
 
-# inform the compiler about eltype of tree iterators so that `collect` works
-Base.IteratorEltype(::Type{<:AbstractTrees.TreeIterator{<:AbstractCommand}}) =
-    Base.HasEltype()
-Base.eltype(::Type{<:AbstractTrees.TreeIterator{<:AbstractCommand}}) = AbstractCommand
+SiblingLinks(::Type{<:AbstractCommand}) = ImplicitSiblings()
 
-# provide a simple default constructor so users can write
+ChildIndexing(::Type{<:AbstractCommand}) = IndexedChildren()
+
+NodeType(::Type{<:AbstractCommand}) = NodeTypeUnknown()
+
+nodetype(::Type{<:AbstractCommand}) = AbstractCommand
+
+childrentype(::Type{Command}) = Vector{AbstractCommand}
+childrentype(::Type{AndCommands{A,B}}) where {A<:AbstractCommand,B<:AbstractCommand} =
+    Tuple{A,B}
+childrentype(::Type{OrCommands{A,B}}) where {A<:AbstractCommand,B<:AbstractCommand} =
+    Tuple{A,B}
+childrentype(::Type{RedirectedCommand{S,D}}) where {S<:AbstractCommand,D<:String} = Tuple{S}
+childrentype(::Type{RedirectedCommand{S,D}}) where {S<:String,D<:AbstractCommand} = Tuple{D}
+
+childtype(::Type{<:AbstractCommand}) = AbstractCommand
+childstatetype(::Type{<:AbstractCommand}) = Union{Nothing,Tuple{AbstractCommand,Int}}
+
+# Inform the compiler about iterator eltype so that `collect` works
+Base.IteratorEltype(::Type{<:TreeIterator{<:AbstractCommand}}) = Base.HasEltype()
+Base.eltype(::Type{<:TreeIterator{<:AbstractCommand}}) = AbstractCommand
+
+"""
+    printnode(io::IO, cmd::AbstractCommand; kw...)
+
+Print a compact tree label for `cmd`.
+
+`Cmd` has native `&` and `pipeline` composition, but these shorter labels make
+tree output read more like shell syntax. This affects display only.
+"""
+# Print labels directly rather than showing quoted strings
+printnode(io::IO, cmd::AbstractCommand; kw...) = print(io, nodevalue(cmd))
+
+# Provide a simple default constructor so users can write
 # `AbstractTrees.TreeIterator(cmd)` without running into a method error.
-AbstractTrees.TreeIterator(cmd::AbstractCommand) = AbstractTrees.PreOrderDFS(cmd)
+TreeIterator(cmd::AbstractCommand) = PreOrderDFS(cmd)
 
-# convenience utility for users: gather all nodes below a root
+# `ascend(select, root, node)` uses this method when parent links are not stored
+# directly on the nodes. Search the rooted tree by identity so commands can be
+# reused as values without forcing parent pointers into the node structs.
+function parent(root::AbstractCommand, node::AbstractCommand)
+    root === node && return nothing
+    for child in children(root)
+        child === node && return root
+        found_parent = parent(child, node)
+        isnothing(found_parent) || return found_parent
+    end
+    return nothing
+end
+
+treesize(node::AbstractCommand) = 1 + sum(treesize, children(node); init=0)
+
+function treebreadth(node::AbstractCommand)
+    if isempty(children(node))
+        return 1
+    end
+    return sum(treebreadth, children(node); init=0)
+end
+
+function treeheight(node::AbstractCommand)
+    if isempty(children(node))
+        return 0
+    end
+    return 1 + maximum(treeheight, children(node); init=0)
+end
+
+# Convenience utilities
 """
-    allnodes(cmd::AbstractCommand) -> Vector{AbstractCommand}
+    collectnodes(cmd::AbstractCommand) -> Vector{AbstractCommand}
 
-Return a vector containing `cmd` and all of its descendants in
-pre‑order (parent before children).  This is simply a thin wrapper over
-`collect(AbstractTrees.TreeIterator(cmd))` but is exported for
-convenience so callers don’t need to pull in `AbstractTrees`.
+Return a vector containing `cmd` and all of its descendants in pre-order
+(parent before children).
 """
-allnodes(cmd::AbstractCommand) = collect(AbstractTrees.TreeIterator(cmd))
+collectnodes(cmd::AbstractCommand) = collect(TreeIterator(cmd))
 
-# allow `for x in cmd` by forwarding to TreeIterator
-Base.iterate(cmd::AbstractCommand) = iterate(AbstractTrees.TreeIterator(cmd))
-Base.iterate(cmd::AbstractCommand, state) = iterate(AbstractTrees.TreeIterator(cmd), state)
+# Allow `for x in cmd` by forwarding to `TreeIterator`
+Base.iterate(cmd::AbstractCommand) = iterate(TreeIterator(cmd))
+Base.iterate(cmd::AbstractCommand, state) = iterate(TreeIterator(cmd), state)
