@@ -1,10 +1,10 @@
 using AbstractTrees:
-    AbstractTrees,
     ImplicitParents,
     ImplicitSiblings,
     IndexedChildren,
     NodeTypeUnknown,
-    PreOrderDFS
+    PreOrderDFS,
+    print_tree
 
 import AbstractTrees:
     children,
@@ -158,3 +158,5 @@ collectnodes(cmd::AbstractCommand) = collect(TreeIterator(cmd))
 # Allow `for x in cmd` by forwarding to `TreeIterator`
 Base.iterate(cmd::AbstractCommand) = iterate(TreeIterator(cmd))
 Base.iterate(cmd::AbstractCommand, state) = iterate(TreeIterator(cmd), state)
+
+Base.show(io::IO, command::AbstractCommand) = print_tree(io, command)
