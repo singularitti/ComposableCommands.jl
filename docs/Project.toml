@@ -2,3 +2,6 @@
 AbstractTrees = "1520ce14-60c1-5f80-bbc7-55ef81b5835c"
 ComposableCommands = "b5b47461-4a42-4db3-bdf2-684fadd57bc3"
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
+
+[compat]
+ComposableCommands = "0.2.0"
