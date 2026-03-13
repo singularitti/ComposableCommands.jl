@@ -18,6 +18,13 @@ useful when dealing with complex commands or dynamically generated commands.
 - Redirection and pipe handling
 - Intuitive API for building and interpreting commands
 
+## Examples
+
+```@contents
+Pages = ["examples.md"]
+Depth = 2:2
+```
+
 See the [Index](@ref main-index) for the complete list of documented functions
 and types.
 
@@ -67,6 +74,7 @@ a few guidelines that should be followed when opening pull requests and contribu
 ```@contents
 Pages = [
     "installation.md",
+    "examples.md",
     "developers/contributing.md",
     "developers/style-guide.md",
     "developers/design-principles.md",

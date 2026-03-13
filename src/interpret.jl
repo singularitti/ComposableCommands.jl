@@ -1,5 +1,25 @@
 export interpret
 
+function _command_words(command::Command)
+    exec = String[command.name]
+    for parameter in values(command.parameters)
+        if parameter isa ShortOption
+            push!(exec, "-$(parameter.name)", string(parameter.value))
+        elseif parameter isa LongOption
+            push!(exec, "--$(parameter.name)=$(parameter.value)")
+        elseif parameter isa ShortFlag
+            push!(exec, "-$(parameter.name)")
+        elseif parameter isa LongFlag
+            push!(exec, "--$(parameter.name)")
+        end
+    end
+    append!(exec, command.arguments)
+    for subcommand in command.subcommands
+        append!(exec, _command_words(subcommand))
+    end
+    return exec
+end
+
 """
     interpret(command::Command)
 
@@ -16,28 +36,8 @@ julia> typeof(cmd)
 Cmd
 ```
 """
-function interpret(command::Command)
-    exec = [command.name]
-    for parameter in values(command.parameters)
-        if parameter isa ShortOption
-            push!(exec, "-$(parameter.name)", string(parameter.value))
-        elseif parameter isa LongOption
-            push!(exec, "--$(parameter.name)=$(parameter.value)")
-        elseif parameter isa ShortFlag
-            push!(exec, "-$(parameter.name)")
-        elseif parameter isa LongFlag
-            push!(exec, "--$(parameter.name)")
-        end
-    end
-    for arg in command.arguments
-        push!(exec, arg)
-    end
-    for subcommand in command.subcommands  # Recursively process subcommands
-        sub_exec = interpret(subcommand)
-        append!(exec, sub_exec.exec)
-    end
-    return Cmd(exec)
-end
+interpret(command::Command) = Cmd(_command_words(command))
+
 """
     interpret(command::RedirectedCommand)
 

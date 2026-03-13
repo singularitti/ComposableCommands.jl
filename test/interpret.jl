@@ -1,8 +1,4 @@
 @testset "Test `interpret`ing commands" begin
-    Base.:(==)(x::Base.OrCmds, y::Base.OrCmds) = x.a == y.a && x.b == y.b
-    Base.:(==)(x::Base.CmdRedirect, y::Base.CmdRedirect) =
-        x.cmd == y.cmd && x.handle == y.handle
-
     @testset "Test `git` with multiple subcommands" begin
         verbose = LongFlag("verbose")
         no = ShortFlag("n")
@@ -62,6 +58,25 @@
             @test typeof(cmd) == Cmd
         end
     end
+    @testset "Test Slurm-style options (exercises as_string)" begin
+        srun = Command("srun", [LongOption("nodes", [1, 5, 9, 13])], ["./test"], [])
+        cmd = interpret(srun)
+        @test cmd == `srun --nodes=1,5,9,13 ./test`
+        sinfo = Command(
+            "sinfo",
+            [
+                ShortFlag("N"),
+                ShortOption(
+                    "O",
+                    ("nodelist", "partition", "cpusstate", "memory", "allocmem", "freemem"),
+                ),
+            ],
+            [],
+            [],
+        )
+        cmd2 = interpret(sinfo)
+        @test cmd2 == `sinfo -N -O nodelist,partition,cpusstate,memory,allocmem,freemem`
+    end
     @testset "Test `AndCommands`" begin
         and = AndCommands(git, rm_redirect)
         cmd = interpret(and)
@@ -76,11 +91,85 @@
         @test cmd == pipeline(interpret(git), interpret(ls))
         @test typeof(cmd) == Base.OrCmds
     end
-    @testset "Test `OrCommands`" begin
+    @testset "Test `OrCommands` as a pipe" begin
         grep = Command("grep", [], [".bashrc"], [])
         pipe = OrCommands(ls, grep)
         cmd = interpret(pipe)
         @test cmd == pipeline(`ls -l -a --directory`, `grep .bashrc`)
         @test typeof(cmd) == Base.OrCmds
+    end
+    @testset "Tree interface" begin
+        verbose = LongFlag("verbose")
+        no = ShortFlag("n")
+        sh = Command("show", [no], ["origin"], [])
+        remote = Command("remote", [verbose], [], [sh])
+        git = Command("git", [], [], [remote])
+        @test collectnodes(git) == [git, remote, sh]
+        @testset "Test order" begin
+            collected = []
+            for n in git
+                push!(collected, n)
+            end
+            @test collected == [git, remote, sh]
+            @test collect(PreOrderDFS(git)) == [git, remote, sh]
+            @test collect(PostOrderDFS(git)) == [sh, remote, git]
+            @test collect(Leaves(git)) == [sh]
+            @test collect(StatelessBFS(git)) == [git, remote, sh]
+        end
+        @testset "Test tree properties" begin
+            @test getdescendant(git, (1, 1)) === sh
+            @test AbstractTrees.parent(git, git) === nothing
+            @test AbstractTrees.parent(git, remote) === git
+            @test AbstractTrees.parent(git, sh) === remote
+            @test treesize(git) == 3
+            @test treebreadth(git) == 1
+            @test treeheight(git) == 2
+        end
+        @testset "Test `ibrun` command" begin
+            vasp = Command("vasp", [], [], [])
+            ibrun = Command("ibrun", [ShortOption("n", 8)], [], [vasp])
+            redir = RedirectedCommand(ibrun, "output.log")
+            @test collectnodes(redir) == [redir, ibrun, vasp]
+            @test collect(PostOrderDFS(redir)) == [vasp, ibrun, redir]
+            @test collect(Leaves(redir)) == [vasp]
+            @test collect(StatelessBFS(redir)) == [redir, ibrun, vasp]
+            @test getdescendant(redir, (1, 1)) === vasp
+            @test AbstractTrees.parent(redir, ibrun) === redir
+            @test AbstractTrees.parent(redir, vasp) === ibrun
+            @testset "Test buffer" begin
+                io_redir = IOBuffer()
+                print_tree(io_redir, redir)
+                out_redir = String(take!(io_redir))
+                @test occursin("> output.log", out_redir)
+                @test occursin("ibrun -n 8", out_redir)
+                @test occursin("vasp", out_redir)
+            end
+        end
+        @testset "Test `OrCommands` as a pipe" begin
+            left = Command("echo", [], ["hello"], [])
+            right = Command("grep", [], ["h"], [])
+            pipe = OrCommands(left, right)
+            @test collectnodes(pipe) == [pipe, left, right]
+            @test collect(PostOrderDFS(pipe)) == [left, right, pipe]
+            @test collect(Leaves(pipe)) == [left, right]
+            @test collect(StatelessBFS(pipe)) == [pipe, left, right]
+            @testset "Test buffer" begin
+                io_pipe = IOBuffer()
+                print_tree(io_pipe, pipe)
+                out_pipe = String(take!(io_pipe))
+                @test occursin("|", out_pipe)
+                @test occursin("echo hello", out_pipe)
+                @test occursin("grep h", out_pipe)
+            end
+            io_and = IOBuffer()
+            print_tree(io_and, AndCommands(left, right))
+            @test occursin("&&", String(take!(io_and)))
+        end
+        io = IOBuffer()
+        print_tree(io, git)
+        out = String(take!(io))
+        @test occursin("git", out)
+        @test occursin("remote --verbose", out)
+        @test occursin("show -n origin", out)
     end
 end
