@@ -191,5 +191,5 @@ conversion behave appropriately for specialized data structures.
 """
 as_string(any) = string(any)
 as_string(str::AbstractString) = str
-as_string(vals::AbstractVector) = join(vals, ",")
-as_string(vals::Tuple) = join(values(vals), ",")
+as_string(vals::AbstractVector) = join(map(as_string, vals), ",")
+as_string(vals::Tuple) = join(map(as_string, vals), ",")
