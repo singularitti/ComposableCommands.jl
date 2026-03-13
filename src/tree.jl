@@ -69,7 +69,11 @@ function nodevalue(r::RedirectedCommand)
     elseif r.source isa String && r.destination isa AbstractCommand
         return "< " * r.source
     else
-        return "redir"
+        # This should be unreachable because the constructor enforces the
+        # allowed combinations of `source` and `destination` types. If we hit
+        # this branch it means something has violated that invariant, so
+        # throw an error rather than silently returning a misleading label.
+        throw(ArgumentError("invalid `RedirectedCommand`!"))
     end
 end
 
