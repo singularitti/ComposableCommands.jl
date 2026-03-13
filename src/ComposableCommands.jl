@@ -1,6 +1,7 @@
 module ComposableCommands
 
 using OrderedCollections: OrderedDict
+using StructEqualHash: @struct_equal_hash
 
 export ShortFlag,
     LongFlag,
@@ -10,10 +11,12 @@ export ShortFlag,
     OrCommands,
     RedirectedCommand,
     Command,
+    collectnodes,
     allnodes
 
 abstract type CommandParameter end
 abstract type Flag <: CommandParameter end
+
 """
     ShortFlag(name::String)
 
@@ -22,6 +25,7 @@ Represent a short flag associated with a command.
 struct ShortFlag <: Flag
     name::String
 end
+@struct_equal_hash ShortFlag
 """
     LongFlag(name::String)
 
@@ -30,6 +34,8 @@ Represent a long flag associated with a command.
 struct LongFlag <: Flag
     name::String
 end
+@struct_equal_hash LongFlag
+
 abstract type Option <: CommandParameter end
 """
     ShortOption(name::String, value)
@@ -41,6 +47,8 @@ struct ShortOption <: Option
     value::String
 end
 ShortOption(name::String, value) = ShortOption(name, as_string(value))
+@struct_equal_hash ShortOption
+
 """
     LongOption(name::String, value)
 
@@ -51,27 +59,31 @@ struct LongOption <: Option
     value::String
 end
 LongOption(name::String, value) = LongOption(name, as_string(value))
+@struct_equal_hash LongOption
+
 abstract type AbstractCommand end
 
 """
     AndCommands(a::AbstractCommand, b::AbstractCommand)
 
-Represent a conjunction of two commands (i.e., both commands are executed).
+Represent two commands executed in parallel via Julia's `&` composition.
 """
 struct AndCommands{A<:AbstractCommand,B<:AbstractCommand} <: AbstractCommand
     a::A
     b::B
 end
+@struct_equal_hash AndCommands
 
 """
     OrCommands(a::AbstractCommand, b::AbstractCommand)
 
-Represent a disjunction of two commands (i.e., either command is executed).
+Represent a pipeline via Julia's `pipeline(cmd1, cmd2)` composition.
 """
 struct OrCommands{A<:AbstractCommand,B<:AbstractCommand} <: AbstractCommand
     a::A
     b::B
 end
+@struct_equal_hash OrCommands
 
 """
     RedirectedCommand(source, destination)
@@ -102,6 +114,7 @@ struct RedirectedCommand{S,D} <: AbstractCommand
 end
 RedirectedCommand(source::S, destination::D) where {S,D} =
     RedirectedCommand{S,D}(source, destination)
+@struct_equal_hash RedirectedCommand
 
 """
     Command(name, parameters, arguments, subcommands)
@@ -134,6 +147,7 @@ struct Command <: AbstractCommand
         end
     end
 end
+@struct_equal_hash Command
 # See https://github.com/JuliaLang/julia/blob/27c6d97/base/cmd.jl#L381-L395
 function (command::Command)(stdin=nothing, stdout=nothing)
     if stdin !== nothing
