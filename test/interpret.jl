@@ -3,6 +3,24 @@
     Base.:(==)(x::Base.CmdRedirect, y::Base.CmdRedirect) =
         x.cmd == y.cmd && x.handle == y.handle
 
+    @testset "Test structural equality" begin
+        show_a = Command("show", [ShortFlag("n")], ["origin"], [])
+        show_b = Command("show", [ShortFlag("n")], ["origin"], [])
+        remote_a = Command("remote", [LongFlag("verbose")], [], [show_a])
+        remote_b = Command("remote", [LongFlag("verbose")], [], [show_b])
+        git_a = Command("git", [], [], [remote_a])
+        git_b = Command("git", [], [], [remote_b])
+
+        @test ShortFlag("n") == ShortFlag("n")
+        @test LongOption("after-context", 3) == LongOption("after-context", 3)
+        @test show_a == show_b
+        @test remote_a == remote_b
+        @test git_a == git_b
+        @test RedirectedCommand(git_a, "log.txt") == RedirectedCommand(git_b, "log.txt")
+        @test AndCommands(git_a, show_a) == AndCommands(git_b, show_b)
+        @test OrCommands(git_a, show_a) == OrCommands(git_b, show_b)
+    end
+
     @testset "Test `git` with multiple subcommands" begin
         verbose = LongFlag("verbose")
         no = ShortFlag("n")
@@ -76,7 +94,7 @@
         @test cmd == pipeline(interpret(git), interpret(ls))
         @test typeof(cmd) == Base.OrCmds
     end
-    @testset "Test `OrCommands`" begin
+    @testset "Test `OrCommands` as a pipe" begin
         grep = Command("grep", [], [".bashrc"], [])
         pipe = OrCommands(ls, grep)
         cmd = interpret(pipe)
@@ -84,65 +102,83 @@
         @test typeof(cmd) == Base.OrCmds
     end
 
-    # ===== tree interface checks =====
     @testset "Tree interface" begin
         using AbstractTrees
 
-        # reuse previously defined git/remote/show
-        # directly constructing the iterator should succeed now
+        AbstractCommandT = ComposableCommands.AbstractCommand
+
+        verbose = LongFlag("verbose")
+        no = ShortFlag("n")
+        sh = Command("show", [no], ["origin"], [])
+        remote = Command("remote", [verbose], [], [sh])
+        git = Command("git", [], [], [remote])
+
         nodes = collect(TreeIterator(git))
-        @test length(nodes) == 2
-        @test nodes[1] === git
-        @test nodes[2] === remote
+        @test nodes == AbstractCommandT[git, remote, sh]
+        @test collectnodes(git) == nodes
+        @test collectnodes(git) == nodes
 
-        # convenience wrapper exported by package
-        @test allnodes(git) == nodes
-
-        # iterable command (for loop) should produce same sequence
-        collected = AbstractVector{Any}()
+        collected = AbstractCommandT[]
         for n in git
             push!(collected, n)
         end
         @test collected == nodes
 
-        # iterating from a descendant is allowed too
-        sub = remote
-        subnodes = collect(TreeIterator(sub))
-        @test subnodes == [sub, sh]
-        @test allnodes(sub) == subnodes
+        @test collect(PreOrderDFS(git)) == AbstractCommandT[git, remote, sh]
+        @test collect(PostOrderDFS(git)) == AbstractCommandT[sh, remote, git]
+        @test collect(Leaves(git)) == AbstractCommandT[sh]
+        @test collect(StatelessBFS(git)) == AbstractCommandT[git, remote, sh]
+        @test getdescendant(git, (1, 1)) === sh
+        @test AbstractTrees.parent(git, git) === nothing
+        @test AbstractTrees.parent(git, remote) === git
+        @test AbstractTrees.parent(git, sh) === remote
+        @test treesize(git) == 3
+        @test treebreadth(git) == 1
+        @test treeheight(git) == 2
 
-        # complex nested/redirection example (ibrun -n $ncpu $VASP >& output.log)
-        ncpu = 8
         vasp = Command("vasp", [], [], [])
-        ibrun = Command("ibrun", [ShortOption("n", ncpu)], [], [vasp])
+        ibrun = Command("ibrun", [ShortOption("n", 8)], [], [vasp])
         redir = RedirectedCommand(ibrun, "output.log")
-        @test allnodes(redir) == [redir, ibrun]
-        io = IOBuffer(); print_tree(io, redir);
-        str = String(take!(io))
-        @test occursin("ibrun", str)
-        @test occursin("-n 8", str)            # option shown
-        @test occursin("vasp", str)           # argument shown
-        @test occursin("> output.log", str)   # redirect label now shell-like
+        @test collectnodes(redir) == AbstractCommandT[redir, ibrun, vasp]
+        @test collectnodes(redir) == AbstractCommandT[redir, ibrun, vasp]
+        @test collect(PostOrderDFS(redir)) == AbstractCommandT[vasp, ibrun, redir]
+        @test collect(Leaves(redir)) == AbstractCommandT[vasp]
+        @test collect(StatelessBFS(redir)) == AbstractCommandT[redir, ibrun, vasp]
+        @test getdescendant(redir, (1, 1)) === vasp
+        @test AbstractTrees.parent(redir, ibrun) === redir
+        @test AbstractTrees.parent(redir, vasp) === ibrun
 
-        # a pipe should render as a `|` node with both sides expanded
         left = Command("echo", [], ["hello"], [])
         right = Command("grep", [], ["h"], [])
         pipe = OrCommands(left, right)
-        io2 = IOBuffer(); print_tree(io2, pipe); out2 = String(take!(io2))
-        @test occursin("|", out2)                  # pipe symbol at root
-        @test occursin("echo hello", out2)         # left child shown
-        @test occursin("grep h", out2)            # right child shown
+        @test collectnodes(pipe) == AbstractCommandT[pipe, left, right]
+        @test collect(PostOrderDFS(pipe)) == AbstractCommandT[left, right, pipe]
+        @test collect(Leaves(pipe)) == AbstractCommandT[left, right]
+        @test collect(StatelessBFS(pipe)) == AbstractCommandT[pipe, left, right]
 
         io = IOBuffer()
         print_tree(io, git)
-        str = String(take!(io))
-        @test occursin("git", str)
-        @test occursin("--verbose", str)        # flag shown inline
-        @test occursin("└─ remote", str)
+        out = String(take!(io))
+        @test occursin("git", out)
+        @test occursin("remote --verbose", out)
+        @test occursin("show -n origin", out)
 
-        # `AndCommands` should show shell '&&' operator
-        and = AndCommands(git, ls)
-        io_and = IOBuffer(); print_tree(io_and, and); out_and = String(take!(io_and))
-        @test occursin("&&", out_and)
+        io_redir = IOBuffer()
+        print_tree(io_redir, redir)
+        out_redir = String(take!(io_redir))
+        @test occursin("> output.log", out_redir)
+        @test occursin("ibrun -n 8", out_redir)
+        @test occursin("vasp", out_redir)
+
+        io_pipe = IOBuffer()
+        print_tree(io_pipe, pipe)
+        out_pipe = String(take!(io_pipe))
+        @test occursin("|", out_pipe)
+        @test occursin("echo hello", out_pipe)
+        @test occursin("grep h", out_pipe)
+
+        io_and = IOBuffer()
+        print_tree(io_and, AndCommands(left, right))
+        @test occursin("&&", String(take!(io_and)))
     end
 end
