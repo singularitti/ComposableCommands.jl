@@ -18,6 +18,7 @@ makedocs(;
         "Home" => "index.md",
         "Manual" => [
             "Installation guide" => "installation.md",
+            "Examples" => "examples.md",
         ],
         "API Reference" => "api.md",
         "Developer Docs" => [
