@@ -6,44 +6,33 @@ CurrentModule = ComposableCommands
 
 Documentation for [ComposableCommands](https://github.com/singularitti/ComposableCommands.jl).
 
-ComposableCommands.jl is a Julia package that simplifies the process of interpreting and
-building command-line instructions. It allows you to programmatically construct commands,
-manage command parameters, handle command redirections, and much more. This is particularly
-useful when dealing with complex commands or dynamically generated commands.
+See the [Index](@ref main-index) for the complete list of documented functions
+and types.
 
-## Features
+The code, which is [hosted on GitHub](https://github.com/singularitti/ComposableCommands.jl), is tested
+using various continuous integration services for its validity.
+
+This repository is created and maintained by
+[@singularitti](https://github.com/singularitti), and contributions are highly welcome.
+
+## Package features
 
 - Abstract representation of command line commands, options, flags, and arguments
 - Support for subcommands and command composition
 - Redirection and pipe handling
 - Intuitive API for building and interpreting commands
 
-## Examples
-
-```@contents
-Pages = ["examples.md"]
-Depth = 2:2
-```
-
-See the [Index](@ref main-index) for the complete list of documented functions
-and types.
-
-The code is [hosted on GitHub](https://github.com/singularitti/ComposableCommands.jl),
-with some continuous integration services to test its validity.
-
-This repository is created and maintained by [@singularitti](https://github.com/singularitti).
-You are very welcome to contribute.
-
 ## Installation
 
 The package can be installed with the Julia package manager.
-From the Julia REPL, type `]` to enter the Pkg REPL mode and run:
+From [the Julia REPL](https://docs.julialang.org/en/v1/stdlib/REPL/), type `]` to enter
+the [Pkg mode](https://docs.julialang.org/en/v1/stdlib/REPL/#Pkg-mode) and run:
 
-```julia
+```julia-repl
 pkg> add ComposableCommands
 ```
 
-Or, equivalently, via the `Pkg` API:
+Or, equivalently, via [`Pkg.jl`](https://pkgdocs.julialang.org/v1/):
 
 ```@repl
 import Pkg; Pkg.add("ComposableCommands")
@@ -56,29 +45,28 @@ import Pkg; Pkg.add("ComposableCommands")
 
 ## Project status
 
-The package is tested against, and being developed for, Julia `1.6` and above on Linux,
-macOS, and Windows.
+The package is developed for and tested against Julia `v1.6` and above on Linux, macOS, and
+Windows.
 
 ## Questions and contributions
 
-Usage questions can be posted on
+You can post usage questions on
 [our discussion page](https://github.com/singularitti/ComposableCommands.jl/discussions).
 
-Contributions are very welcome, as are feature requests and suggestions. Please open an
-[issue](https://github.com/singularitti/ComposableCommands.jl/issues)
-if you encounter any problems. The [Contributing](@ref) page has
+We welcome contributions, feature requests, and suggestions. If you encounter any problems,
+please open an [issue](https://github.com/singularitti/ComposableCommands.jl/issues).
+The [Contributing](@ref) page has
 a few guidelines that should be followed when opening pull requests and contributing code.
 
 ## Manual outline
 
 ```@contents
 Pages = [
-    "installation.md",
-    "examples.md",
+    "man/installation.md",
+    "man/troubleshooting.md",
     "developers/contributing.md",
     "developers/style-guide.md",
     "developers/design-principles.md",
-    "troubleshooting.md",
 ]
 Depth = 3
 ```
@@ -86,11 +74,11 @@ Depth = 3
 ## Library outline
 
 ```@contents
-Pages = ["api.md"]
+Pages = ["lib/public.md", "lib/internals.md"]
 ```
 
 ### [Index](@id main-index)
 
 ```@index
-Pages = ["api.md"]
+Pages = ["lib/public.md"]
 ```
