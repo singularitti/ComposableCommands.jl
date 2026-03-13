@@ -156,6 +156,39 @@ function (command::Command)(stdin=nothing, stdout=nothing)
     return command
 end
 
+"""
+    as_string(x)
+
+Convert a value to a string appropriate for use as a command option
+value.  This helper is primarily used by the `ShortOption` and
+`LongOption` constructors, which delegate to `as_string` to normalize their
+`value` argument.
+
+The following behaviors are supported:
+
+- scalars – anything not matching the other methods is passed through
+  `string` (e.g. numbers, custom types).
+- strings – if the value is already an `AbstractString` it is returned
+  unchanged.
+- vectors – elements are joined with commas, yielding a single
+  comma‑separated string.
+- tuples – the tuple’s values are joined with commas as well (useful
+  for short options like `-O` in examples below).
+
+Examples
+```julia
+julia> as_string(3)
+"3"
+julia> as_string([1,2,3])
+"1,2,3"
+julia> as_string(("a","b"))
+"a,b"
+```
+
+Users may extend `as_string` for their own custom types by defining
+additional methods; this is the recommended way to make the option-values
+conversion behave appropriately for specialized data structures.
+"""
 as_string(any) = string(any)
 as_string(str::AbstractString) = str
 as_string(vals::AbstractVector) = join(vals, ",")
