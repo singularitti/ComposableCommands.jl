@@ -38,9 +38,9 @@ children(r::RedirectedCommand{<:String,<:AbstractCommand}) = (r.destination,)
 # be shown, which is rarely what the user wants. For `Command`, we render the
 # name together with its parameters and arguments on a single line, and only
 # show subcommands as children.
-function _commandlabel(cmd::Command)
+nodevalue(cmd::Command) = begin
+    # Parameters follow shell syntax and positional arguments come last.
     parts = String[cmd.name]
-    # Parameters follow shell syntax
     for p in values(cmd.parameters)
         if p isa ShortFlag
             push!(parts, "-" * p.name)
@@ -52,12 +52,9 @@ function _commandlabel(cmd::Command)
             push!(parts, "--" * p.name * "=" * string(p.value))
         end
     end
-    # Positional arguments come last.
     append!(parts, cmd.arguments)
-    return join(parts, ' ')
+    join(parts, ' ')
 end
-
-nodevalue(cmd::Command) = _commandlabel(cmd)
 # Composite operations use compact shell-like labels in tree output
 nodevalue(::AndCommands) = "&&"
 nodevalue(::OrCommands) = "|"
