@@ -10,7 +10,7 @@ StructEqualHash = "8bd03d06-bfef-4aaf-8250-1a26cbb401bf"
 
 [compat]
 AbstractTrees = "0.4"
-OrderedCollections = "1"
+OrderedCollections = "1, 2.0"
 StructEqualHash = "0.1"
 julia = "1"
 
